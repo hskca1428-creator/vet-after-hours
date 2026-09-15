@@ -1,0 +1,8 @@
+node_modules/
+dist/
+.vercel/
+.env*
+!.env.example
+.npm-cache/
+research/localities-source.json
+qa/
