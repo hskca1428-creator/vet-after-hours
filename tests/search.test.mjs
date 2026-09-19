@@ -25,7 +25,9 @@ test('distances are symmetrical, zero at origin, and Geelong results come first 
 test('24-hour filter excludes unreviewed hours',()=>{
  const filtered=rankClinics(clinics,null,'24h');assert.ok(filtered.length);
  assert.ok(filtered.every(c=>c.verification_status==='website_checked'&&c.service_type==='hospital_24h'));
- assert.ok(!filtered.some(c=>c.id==='geelong-emergency'));
+ assert.ok(filtered.some(c=>c.id==='geelong-emergency'));
+ assert.ok(filtered.some(c=>c.id==='aec-frankston'));
+ assert.ok(!filtered.some(c=>c.id==='central-bendigo'||c.id==='gippsland-warragul'));
 });
 test('unresolved and rotating destinations never produce directions',()=>{
  for(const c of clinics.filter(c=>c.verification_status==='needs_review'||c.service_type.includes('rotating')))assert.equal(directionsUrl(c),null);
@@ -36,3 +38,4 @@ test('data has unique IDs, valid phone links and no invented real-time status',(
  for(const c of clinics){assert.match(c.phone,/^(0\d{9}|1300\d{6})$/);assert.equal(c.accepting_patients_now,null);assert.equal(c.automated_open_now_enabled,false);assert.equal(c.state,'VIC');}
  assert.ok(suburbs.every(s=>s.lat<0&&s.lon>0&&/^\d{4}$/.test(s.postcode)));
 });
+

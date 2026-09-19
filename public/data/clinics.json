@@ -8,17 +8,17 @@
       "id": "advanced-kensington",
       "name": "Advanced Vetcare Kensington",
       "suburb": "Kensington",
-      "address": "Level 1, 26 Robertson Street",
+      "address": "26 Robertson Street",
       "postcode": "3031",
       "state": "VIC",
       "country": "AU",
       "timezone": "Australia/Melbourne",
       "phone": "0390920400",
       "service_type": "hospital_24h",
-      "published_hours_summary": "24 hours",
+      "published_hours_summary": "24 hours a day, 7 days a week",
       "source_url": "https://advancedvetcare.com.au/contact/",
       "verification_status": "website_checked",
-      "notes": "",
+      "notes": "Published schedule clarified by the project owner using clinic website details on 19 September 2026.",
       "source_checked_on": "2026-09-05",
       "clinic_confirmed_on": null,
       "accepting_patients_now": null,
@@ -31,7 +31,12 @@
         "lon": 144.926
       },
       "coordinate_precision": "suburb_centroid",
-      "directions_enabled": true
+      "directions_enabled": true,
+      "previous_review_notes": "",
+      "email": "info@advancedvetcare.com.au",
+      "public_hours": "24 hours a day, 7 days a week",
+      "hours_updated_on": "2026-09-19",
+      "hours_update_basis": "Owner-supplied clinic website details"
     },
     {
       "id": "advanced-kew",
@@ -44,10 +49,10 @@
       "timezone": "Australia/Melbourne",
       "phone": "0390203555",
       "service_type": "hospital_24h",
-      "published_hours_summary": "24 hours",
+      "published_hours_summary": "24 hours a day, 7 days a week",
       "source_url": "https://advancedvetcare.com.au/contact/",
-      "verification_status": "needs_review",
-      "notes": "Same page also formats address as 2/6 Chandler Hwy; confirm entrance before directions.",
+      "verification_status": "website_checked",
+      "notes": "Published schedule clarified by the project owner using clinic website details on 19 September 2026.",
       "source_checked_on": "2026-09-05",
       "clinic_confirmed_on": null,
       "accepting_patients_now": null,
@@ -60,7 +65,12 @@
         "lon": 145.0371
       },
       "coordinate_precision": "suburb_centroid",
-      "directions_enabled": false
+      "directions_enabled": true,
+      "previous_review_notes": "Same page also formats address as 2/6 Chandler Hwy; confirm entrance before directions.",
+      "email": "info@advancedvetcare.com.au",
+      "public_hours": "24 hours a day, 7 days a week",
+      "hours_updated_on": "2026-09-19",
+      "hours_update_basis": "Owner-supplied clinic website details"
     },
     {
       "id": "arh-essendon",
@@ -96,17 +106,17 @@
       "name": "Centre for Animal Referral & Emergency",
       "suburb": "Collingwood",
       "address": "5 Hood Street",
-      "postcode": null,
+      "postcode": "3066",
       "state": "VIC",
       "country": "AU",
       "timezone": "Australia/Melbourne",
       "phone": "0394176417",
-      "service_type": "emergency_hospital",
-      "published_hours_summary": "Network describes 24/7 Melbourne services; branch hours need checking",
-      "source_url": "https://www.emergencyvet.com.au/our-network/melbourne-locations.html",
-      "verification_status": "needs_review",
-      "notes": "Check branch-specific hours.",
-      "source_checked_on": "2026-09-05",
+      "service_type": "hospital_24h",
+      "published_hours_summary": "24 hours a day, 7 days a week",
+      "source_url": "https://carevet.com.au/wp/contact/",
+      "verification_status": "website_checked",
+      "notes": "Published schedule clarified by the project owner using clinic website details on 19 September 2026.",
+      "source_checked_on": "2026-09-19",
       "clinic_confirmed_on": null,
       "accepting_patients_now": null,
       "species_confirmed": [],
@@ -118,8 +128,11 @@
         "lon": 144.9872
       },
       "coordinate_precision": "suburb_centroid",
-      "directions_enabled": false,
-      "public_hours": "Emergency service — call to confirm hours"
+      "directions_enabled": true,
+      "public_hours": "24 hours a day, 7 days a week",
+      "previous_review_notes": "Check branch-specific hours.",
+      "hours_updated_on": "2026-09-19",
+      "hours_update_basis": "Owner-supplied clinic website details"
     },
     {
       "id": "aec-mount-waverley",
@@ -242,17 +255,17 @@
       "name": "Animal Emergency Centre Frankston",
       "suburb": "Frankston",
       "address": "39 McMahons Road",
-      "postcode": null,
+      "postcode": "3199",
       "state": "VIC",
       "country": "AU",
       "timezone": "Australia/Melbourne",
       "phone": "0397705555",
-      "service_type": "after_hours",
-      "published_hours_summary": "After-hours service; exact branch hours pending",
-      "source_url": "https://www.emergencyvet.com.au/our-network/melbourne-locations.html",
-      "verification_status": "needs_review",
-      "notes": "Do not infer 24/7 from network marketing.",
-      "source_checked_on": "2026-09-05",
+      "service_type": "hospital_24h",
+      "published_hours_summary": "24 hours a day, 7 days a week",
+      "source_url": "https://www.emergencyvet.com.au/our-network/aec-home/aec-frankston.html",
+      "verification_status": "website_checked",
+      "notes": "Published schedule clarified by the project owner using clinic website details on 19 September 2026.",
+      "source_checked_on": "2026-09-19",
       "clinic_confirmed_on": null,
       "accepting_patients_now": null,
       "species_confirmed": [],
@@ -264,8 +277,11 @@
         "lon": 145.1407
       },
       "coordinate_precision": "suburb_centroid",
-      "directions_enabled": false,
-      "public_hours": "After-hours emergency care — call to confirm hours"
+      "directions_enabled": true,
+      "public_hours": "24 hours a day, 7 days a week",
+      "previous_review_notes": "Do not infer 24/7 from network marketing.",
+      "hours_updated_on": "2026-09-19",
+      "hours_update_basis": "Owner-supplied clinic website details"
     },
     {
       "id": "geelong-emergency",
@@ -278,10 +294,10 @@
       "timezone": "Australia/Melbourne",
       "phone": "0352222139",
       "service_type": "hospital_24h",
-      "published_hours_summary": "Own contact page advertises 24/7 onsite staff",
+      "published_hours_summary": "24 hours a day, 7 days a week",
       "source_url": "https://www.geelonganimalemergency.com.au/contact-us/",
-      "verification_status": "needs_review",
-      "notes": "Search-indexed official contact page reviewed; direct fetch failed. Referring clinic pages describe different hours. Recheck provider and confirm overnight intake.",
+      "verification_status": "website_checked",
+      "notes": "Published schedule clarified by the project owner using clinic website details on 19 September 2026.",
       "source_checked_on": "2026-09-05",
       "clinic_confirmed_on": null,
       "accepting_patients_now": null,
@@ -294,8 +310,11 @@
         "lon": 144.3603
       },
       "coordinate_precision": "suburb_centroid",
-      "directions_enabled": false,
-      "public_hours": "Advertises 24-hour care — overnight availability needs confirmation"
+      "directions_enabled": true,
+      "public_hours": "24 hours a day, 7 days a week",
+      "previous_review_notes": "Search-indexed official contact page reviewed; direct fetch failed. Referring clinic pages describe different hours. Recheck provider and confirm overnight intake.",
+      "hours_updated_on": "2026-09-19",
+      "hours_update_basis": "Owner-supplied clinic website details"
     },
     {
       "id": "gars-newtown",
@@ -366,10 +385,10 @@
       "timezone": "Australia/Melbourne",
       "phone": "0413898331",
       "service_type": "after_hours_on_call",
-      "published_hours_summary": "Detailed section: Fri 18:00-midnight; Sat/Sun 08:30-midnight; limited overnight on-call",
+      "published_hours_summary": "Monday–Thursday: closed. Friday: 6 pm–midnight. Saturday & Sunday: 8:30 am–midnight.",
       "source_url": "https://www.centralvetemergency.com/",
-      "verification_status": "needs_review",
-      "notes": "Conflicting AM/PM and overall coverage text. Detailed section says no Sunday overnight on-call; weekday callers should contact regular vet. Confirm hours, holiday exceptions and street number.",
+      "verification_status": "website_checked",
+      "notes": "On-call service unavailable on Sunday nights due to staffing shortages; callers may be referred to Melbourne. On-call end times are not specified. Call to confirm care and treatment location.",
       "source_checked_on": "2026-09-05",
       "clinic_confirmed_on": null,
       "accepting_patients_now": null,
@@ -383,7 +402,16 @@
       },
       "coordinate_precision": "suburb_centroid",
       "directions_enabled": false,
-      "public_hours": "Weekend emergency service with limited on-call coverage"
+      "public_hours": "Monday–Thursday: closed. Friday: 6 pm–midnight. Saturday & Sunday: 8:30 am–midnight.",
+      "previous_review_notes": "Conflicting AM/PM and overall coverage text. Detailed section says no Sunday overnight on-call; weekday callers should contact regular vet. Confirm hours, holiday exceptions and street number.",
+      "hours_lines": [
+        "Monday–Thursday: closed",
+        "Friday: 6 pm–midnight; on-call from midnight",
+        "Saturday: 8:30 am–midnight; on-call from midnight",
+        "Sunday: 8:30 am–midnight; no overnight on-call"
+      ],
+      "hours_updated_on": "2026-09-19",
+      "hours_update_basis": "Owner-supplied detailed clinic schedule"
     },
     {
       "id": "gippsland-warragul",
@@ -396,10 +424,10 @@
       "timezone": "Australia/Melbourne",
       "phone": "0356234421",
       "service_type": "after_hours",
-      "published_hours_summary": "Main text: Friday 18:00-Monday 08:00 plus public holidays",
+      "published_hours_summary": "Open continuously from Friday 6 pm to Monday 8 am, plus public holidays.",
       "source_url": "https://gippslandpetemergency.com.au/",
-      "verification_status": "needs_review",
-      "notes": "FAQ instead starts Saturday 08:00. Confirm Friday coverage and holiday hours.",
+      "verification_status": "website_checked",
+      "notes": "Uses the main operating-hours statement supplied by the project owner. Public-holiday opening and closing times should be confirmed by phone.",
       "source_checked_on": "2026-09-05",
       "clinic_confirmed_on": null,
       "accepting_patients_now": null,
@@ -412,8 +440,12 @@
         "lon": 145.934
       },
       "coordinate_precision": "suburb_centroid",
-      "directions_enabled": false,
-      "public_hours": "Weekend and public-holiday emergency care"
+      "directions_enabled": true,
+      "public_hours": "Open continuously from Friday 6 pm to Monday 8 am, plus public holidays.",
+      "previous_review_notes": "FAQ instead starts Saturday 08:00. Confirm Friday coverage and holiday hours.",
+      "hours_updated_on": "2026-09-19",
+      "hours_update_basis": "Owner-supplied main clinic operating-hours statement"
     }
   ]
 }
+
