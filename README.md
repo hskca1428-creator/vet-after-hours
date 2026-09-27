@@ -25,7 +25,7 @@ Preview: http://127.0.0.1:4173. Build output: dist/. Vercel configuration is inc
 
 ## Important limits before public launch
 
-- This is a preview. robots.txt, HTML metadata and Vercel headers prevent indexing. Remove all three only when ready for public launch.
+- Production indexing is enabled. Canonical URLs use https://www.vetafterhours.au and public/sitemap.xml lists the public pages.
 - Coverage is incomplete. Do not advertise comprehensive Victoria-wide service coverage.
 - Clinic data was website-reviewed on 5 September 2026. Six records require further review. No telephone verification or live intake status.
 - Coordinates refer to suburb centres, not clinic street entrances. Distances are approximate straight-line estimates. Geocode actual treatment addresses before claiming nearest-clinic precision.
