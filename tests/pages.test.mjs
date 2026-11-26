@@ -110,7 +110,7 @@ test('clinic pages have unique copy, canonicals and VeterinaryCare JSON-LD', () 
     assert.equal(entity.telephone, schemaTelephone(clinic.phone));
     assert.equal(entity.address.streetAddress, clinic.address);
     assert.equal(entity.address.addressLocality, clinic.suburb);
-    assert.equal(entity.address.addressRegion, 'VIC');
+    assert.equal(entity.address.addressRegion, clinic.state);
     assert.equal(entity.address.addressCountry, 'AU');
     if (clinic.postcode) assert.equal(entity.address.postalCode, clinic.postcode);
     else assert.equal(Object.hasOwn(entity.address, 'postalCode'), false);
@@ -145,6 +145,14 @@ test('clinic pages have unique copy, canonicals and VeterinaryCare JSON-LD', () 
   assert.match(page('/clinics/advanced-kensington').html, /href="\/areas\/melbourne"/);
   assert.match(page('/clinics/advanced-kensington').html, /Hours clarified 19 Sept 2026/);
   assert.match(meta(page('/clinics/advanced-kensington').html, 'description'), /7 days a week\. Call 03 9092 0400/);
+  const northRyde = page('/clinics/sash-north-ryde').html;
+  assert.match(northRyde, /North Ryde NSW 2113/);
+  assert.equal(veterinary(northRyde).address.addressRegion, 'NSW');
+  assert.match(veterinary(northRyde).areaServed.containedInPlace.name, /New South Wales/);
+  assert.match(page('/clinics/veca-norwest').html, /1 December 2026/);
+  assert.match(page('/clinics/veca-campbelltown').html, /1 December 2026/);
+  assert.equal(clinics.some(clinic => clinic.id === 'arh-baulkham-hills'), false);
+  assert.match(page('/clinics/advanced-kensington').html, /Kensington VIC 3031/);
 });
 
 test('opening hours are omitted when the stored text does not support them', () => {
@@ -215,6 +223,19 @@ test('area and 24-hour pages link the clinics they actually list', () => {
   assert.match(twentyFour, /href="\/areas\/bendigo"/);
   assert.match(twentyFour, /href="\/areas\/gippsland"/);
   assert.doesNotMatch(twentyFour, /href="\/areas\/warragul"/);
+  assert.match(twentyFour, /Greater Sydney/);
+  assert.match(page('/states/vic').html, /Advanced Vetcare Kensington/);
+  assert.match(page('/states/vic').html, /href="\/areas\/melbourne"/);
+  assert.doesNotMatch(page('/states/vic').html, /SASH North Ryde/);
+  assert.match(page('/states/nsw').html, /SASH North Ryde/);
+  assert.match(page('/states/nsw').html, /Greater Sydney/);
+  assert.match(page('/states/nsw').html, /href="\/areas\/inner-west"/);
+  assert.match(page('/areas/blue-mountains').html, /Limited after-hours service/);
+  assert.match(page('/areas/north-shore-and-northern-beaches').html, /Northside Emergency Veterinary Service/);
+  assert.doesNotMatch(page('/states/nsw').html, /Baulkham Hills/);
+  const areaServed = jsonLdBlocks(site.indexHtml)[0]['@graph'].find(node => node['@type'] === 'WebSite').areaServed;
+  assert.ok(areaServed.some(area => area.name === 'Victoria'));
+  assert.ok(areaServed.some(area => area.name === 'Greater Sydney'));
   const descriptions = site.pages.map(item => meta(item.html, 'description'));
   assert.equal(new Set(descriptions).size, descriptions.length);
 });
@@ -303,6 +324,15 @@ test('dev server serves crawlable HTML and a custom 404', async () => {
     const gippslandPage = await fetch('http://127.0.0.1:47823/areas/gippsland');
     assert.equal(gippslandPage.status, 200);
     assert.match(await gippslandPage.text(), /Existing clients only/);
+    const sydneyClinic = await fetch('http://127.0.0.1:47823/clinics/sash-north-ryde');
+    assert.equal(sydneyClinic.status, 200);
+    assert.match(await sydneyClinic.text(), /North Ryde NSW/);
+    const nswPage = await fetch('http://127.0.0.1:47823/states/nsw');
+    assert.equal(nswPage.status, 200);
+    assert.match(await nswPage.text(), /Greater Sydney/);
+    const nswShortcut = await fetch('http://127.0.0.1:47823/nsw', {redirect: 'manual'});
+    assert.equal(nswShortcut.status, 301);
+    assert.equal(nswShortcut.headers.get('location'), '/states/nsw');
     const oldArea = await fetch('http://127.0.0.1:47823/areas/warragul', {redirect: 'manual'});
     assert.equal(oldArea.status, 301);
     assert.equal(oldArea.headers.get('location'), '/areas/gippsland');

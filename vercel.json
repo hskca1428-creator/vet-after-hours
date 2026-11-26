@@ -9,6 +9,16 @@
       "source": "/areas/warragul",
       "destination": "/areas/gippsland",
       "permanent": true
+    },
+    {
+      "source": "/vic",
+      "destination": "/states/vic",
+      "permanent": true
+    },
+    {
+      "source": "/nsw",
+      "destination": "/states/nsw",
+      "permanent": true
     }
   ],
   "headers": [

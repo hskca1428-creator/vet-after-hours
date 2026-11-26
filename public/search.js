@@ -2,8 +2,10 @@ export function normalize(value) { return value.toLowerCase().replace(/[^a-z0-9 
 export function matchSuburbs(suburbs, query) {
   const q = normalize(query);
   if (!q) return [];
-  return suburbs.filter(s => normalize(`${s.name} VIC ${s.postcode}`).includes(q) || normalize(`${s.name} ${s.postcode}`).includes(q))
-    .sort((a,b) => Number(normalize(b.name) === q) - Number(normalize(a.name) === q) || a.name.localeCompare(b.name)).slice(0,10);
+  return suburbs.filter(s => {
+    const state = s.state || '';
+    return normalize(`${s.name} ${state} ${s.postcode}`).includes(q) || normalize(`${s.name} ${s.postcode}`).includes(q);
+  }).sort((a,b) => Number(normalize(b.name) === q) - Number(normalize(a.name) === q) || a.name.localeCompare(b.name) || String(a.state || '').localeCompare(String(b.state || '')) || String(a.postcode).localeCompare(String(b.postcode))).slice(0,10);
 }
 export function distanceKm(a,b) {
   const r = Math.PI / 180;
@@ -25,5 +27,6 @@ export function rankClinics(clinics, origin, filter='all') {
 }
 export function directionsUrl(clinic) {
   if (clinic.directions_enabled !== true) return null;
-  return 'https://www.google.com/maps/dir/?api=1&destination=' + encodeURIComponent(`${clinic.name}, ${clinic.address}, ${clinic.suburb} VIC ${clinic.postcode || ''}, Australia`);
+  const state = clinic.state || '';
+  return 'https://www.google.com/maps/dir/?api=1&destination=' + encodeURIComponent(`${clinic.name}, ${clinic.address}, ${clinic.suburb} ${state} ${clinic.postcode || ''}, Australia`);
 }

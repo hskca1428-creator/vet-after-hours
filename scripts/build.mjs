@@ -19,4 +19,6 @@ for (const page of site.pages) {
   await mkdir(dirname(file), {recursive: true});
   await writeFile(file, page.html);
 }
-console.log(`Built ${clinicsDoc.clinics.length} clinic records, ${site.pages.length} generated pages and ${suburbs.length} Victorian locality/postcode entries.`);
+const vicSuburbs = suburbs.filter(suburb => suburb.state === 'VIC').length;
+const nswSuburbs = suburbs.filter(suburb => suburb.state === 'NSW').length;
+console.log(`Built ${clinicsDoc.clinics.length} clinic records, ${site.pages.length} generated pages and ${suburbs.length} locality/postcode entries (${vicSuburbs} VIC, ${nswSuburbs} NSW).`);
