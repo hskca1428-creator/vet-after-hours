@@ -1,5 +1,6 @@
 import {directionsUrl, rankClinics} from '../public/search.js';
 import {
+  badgeHtml,
   escapeHtml,
   formatAddress,
   formatPhone,
@@ -11,8 +12,12 @@ import {
 } from '../public/present.js';
 
 export const SITE = 'https://www.vetafterhours.au';
-/** Date printed on information.html (privacy copy and locality retrieval). */
-export const INFORMATION_LASTMOD = '2026-09-15';
+/** Sitemap lastmod for information.html. The locality dataset note on that page is still 15 September 2026. */
+export const INFORMATION_LASTMOD = '2026-11-26';
+
+export const AREA_REDIRECTS = [
+  {source: '/areas/warragul', destination: '/areas/gippsland'},
+];
 
 const HOME_TITLE = 'Vet After Hours — Find an emergency vet in Victoria';
 const HOME_DESCRIPTION = 'Find after-hours veterinary services in Victoria. Search your suburb, check published service details and call a clinic. Free to use.';
@@ -21,104 +26,17 @@ const GIPPSLAND_HOURS = 'Open continuously from Friday 6 pm to Monday 8 am, plus
 const CALLOUT = '<div class="callout"><span class="info-icon" aria-hidden="true">i</span><p><strong>Please call before travelling.</strong> Published hours don’t guarantee a clinic can accept your pet. Confirm availability and the treatment location directly.</p></div>';
 
 const AREAS = [
-  {
-    id: 'melbourne',
-    path: '/areas/melbourne',
-    file: 'areas/melbourne.html',
-    nav: 'Melbourne',
-    title: 'Emergency vets in Melbourne — Vet After Hours',
-    h1: 'After-hours vets in Melbourne',
-    clinicIds: [
-      'advanced-kensington',
-      'advanced-kew',
-      'arh-essendon',
-      'care-collingwood',
-      'aec-mount-waverley',
-      'vrh-dandenong',
-      'aec-moorabbin',
-      'gvh-werribee',
-      'aec-frankston',
-    ],
-    description(list) {
-      return `Published 24-hour veterinary hospitals listed for Melbourne: ${joinAnd(list.map(c => c.suburb))}. Call the clinic before you travel. This is not every Melbourne emergency clinic.`;
-    },
-    intro(list) {
-      const moorabbin = list.find(c => c.id === 'aec-moorabbin');
-      const grouped = list.filter(c => c.id === 'aec-frankston' || c.id === 'gvh-werribee');
-      const sentences = [];
-      if (moorabbin) sentences.push(`${escapeHtml(moorabbin.name)} is listed in ${escapeHtml(moorabbin.suburb)}, the suburb on its street address.`);
-      if (grouped.length) sentences.push(`${escapeHtml(joinAnd(grouped.map(c => `${c.name} in ${c.suburb}`)))} ${grouped.length > 1 ? 'are' : 'is'} on this Melbourne page rather than a separate area page.`);
-      sentences.push('This is not every emergency clinic in Melbourne. A suburb that is missing has not been surveyed for this directory.');
-      return `<p>The Melbourne section of this directory has ${list.length} published 24-hour veterinary hospitals: ${escapeHtml(joinAnd(list.map(c => `${c.name} (${c.suburb})`)))}.</p><p>${sentences.join(' ')}</p>`;
-    },
-  },
-  {
-    id: 'geelong',
-    path: '/areas/geelong',
-    file: 'areas/geelong.html',
-    nav: 'Geelong',
-    title: 'Emergency vets in Geelong — Vet After Hours',
-    h1: 'After-hours vets in Geelong',
-    clinicIds: ['geelong-emergency', 'gars-newtown'],
-    description(list) {
-      return `${joinAnd(list.map(c => `${c.name} in ${c.suburb}`))}: both are published 24-hour veterinary hospitals. Call the clinic you plan to visit before travelling.`;
-    },
-    intro(list) {
-      const bits = list.map(c => `${escapeHtml(c.name)} in ${escapeHtml(c.suburb)} (${escapeHtml(formatAddress(c))}, ${escapeHtml(formatPhone(c.phone))})`).join(' and ');
-      return `<p>The Geelong listings are ${list.length} published 24-hour hospitals: ${bits}. They are different clinics. This page cannot tell you which one can accept a patient.</p>`;
-    },
-  },
-  {
-    id: 'ballarat',
-    path: '/areas/ballarat',
-    file: 'areas/ballarat.html',
-    nav: 'Ballarat',
-    title: 'After-hours vet in Ballarat — Vet After Hours',
-    h1: 'After-hours vet in Ballarat',
-    clinicIds: ['ballarat-pet-farm'],
-    description(list) {
-      const c = list[0];
-      return `${c.name} in ${c.suburb}: ${withPeriod(c.published_hours_summary)} ${publicNote(c)}`;
-    },
-    intro(list) {
-      const c = list[0];
-      return `<p>The Ballarat listing is ${escapeHtml(c.name)} at ${escapeHtml(formatAddress(c))}. It is a call-first after-hours pathway, not a published 24-hour hospital. Published hours: ${escapeHtml(withPeriod(c.published_hours_summary))}</p><p>${escapeHtml(publicNote(c))} This record has no directions link, because the clinic asks you to confirm the treatment location on the phone. The Geelong and Melbourne pages list the published 24-hour hospitals those overnight calls are directed toward.</p>`;
-    },
-  },
-  {
-    id: 'bendigo',
-    path: '/areas/bendigo',
-    file: 'areas/bendigo.html',
-    nav: 'Bendigo',
-    title: 'After-hours vet in Bendigo — Vet After Hours',
-    h1: 'After-hours vet in Bendigo',
-    clinicIds: ['central-bendigo'],
-    description(list) {
-      const c = list[0];
-      return `${c.name} in ${c.suburb} is an on-call service, not a 24-hour hospital. ${publicNote(c)}`;
-    },
-    intro(list) {
-      const c = list[0];
-      return `<p>The Bendigo-area listing is ${escapeHtml(c.name)} at ${escapeHtml(formatAddress(c))}. It is an after-hours on-call service, not a published 24-hour hospital. The phone number in this directory is ${escapeHtml(formatPhone(c.phone))}.</p><p>${escapeHtml(publicNote(c))} This record has no directions link, because the treatment location is confirmed when you call. If you are referred on, the Melbourne page lists published 24-hour hospitals.</p>`;
-    },
-  },
-  {
-    id: 'warragul',
-    path: '/areas/warragul',
-    file: 'areas/warragul.html',
-    nav: 'Warragul',
-    title: 'After-hours vet in Warragul and Gippsland — Vet After Hours',
-    h1: 'After-hours vet in Warragul and Gippsland',
-    clinicIds: ['gippsland-warragul'],
-    description(list) {
-      const c = list[0];
-      return `${c.name} in ${c.suburb}: ${withPeriod(c.public_hours || c.published_hours_summary)} Not a 24-hour hospital. No other Gippsland town is in this directory. Call before travelling.`;
-    },
-    intro(list) {
-      const c = list[0];
-      return `<p>The only Gippsland listing in this directory is ${escapeHtml(c.name)} at ${escapeHtml(formatAddress(c))}. Published hours: ${escapeHtml(withPeriod(c.public_hours || c.published_hours_summary))} It is an after-hours service, not a 24-hour hospital. The phone number in this directory is ${escapeHtml(formatPhone(c.phone))}.</p><p>No other Gippsland town is listed. That is a limit of this directory, not a finding that those towns have no after-hours vet. The published hours include public holidays; confirm the day’s times, and whether they can see your pet, by phone.</p>`;
-    },
-  },
+  {id: 'melbourne', region: 'Melbourne', path: '/areas/melbourne', file: 'areas/melbourne.html', nav: 'Melbourne', title: 'Emergency vets in Melbourne — Vet After Hours', h1: 'After-hours vets in Melbourne', description: describeArea, intro: melbourneIntro},
+  {id: 'mornington-peninsula', region: 'Mornington Peninsula', path: '/areas/mornington-peninsula', file: 'areas/mornington-peninsula.html', nav: 'Mornington Peninsula', title: 'Emergency vet in Mornington — Vet After Hours', h1: 'After-hours vet in Mornington', description: describeArea, intro: morningtonIntro},
+  {id: 'yarra-valley', region: 'Yarra Valley / Outer East', path: '/areas/yarra-valley', file: 'areas/yarra-valley.html', nav: 'Yarra Valley', title: 'After-hours vets in the Yarra Valley — Vet After Hours', h1: 'After-hours vets in the Yarra Valley', description: describeArea, intro: yarraIntro},
+  {id: 'geelong', region: 'Geelong & Surf Coast', path: '/areas/geelong', file: 'areas/geelong.html', nav: 'Geelong', title: 'Emergency vets in Geelong — Vet After Hours', h1: 'After-hours vets in Geelong', description: describeArea, intro: geelongIntro},
+  {id: 'colac', region: 'Colac', path: '/areas/colac', file: 'areas/colac.html', nav: 'Colac', title: 'After-hours vets in Colac — Vet After Hours', h1: 'After-hours vets in Colac', description: describeArea, intro: colacIntro},
+  {id: 'ballarat', region: 'Ballarat', path: '/areas/ballarat', file: 'areas/ballarat.html', nav: 'Ballarat', title: 'After-hours vet in Ballarat — Vet After Hours', h1: 'After-hours vet in Ballarat', description: describeArea, intro: ballaratIntro},
+  {id: 'bendigo', region: 'Bendigo & Central', path: '/areas/bendigo', file: 'areas/bendigo.html', nav: 'Bendigo', title: 'After-hours vets in Bendigo and central Victoria — Vet After Hours', h1: 'After-hours vets in Bendigo and central Victoria', description: describeArea, intro: bendigoIntro},
+  {id: 'hume', region: 'Hume / North East', path: '/areas/hume', file: 'areas/hume.html', nav: 'Hume & North East', title: 'After-hours vets in Hume and north-east Victoria — Vet After Hours', h1: 'After-hours vets in Hume and north-east Victoria', description: describeArea, intro: humeIntro},
+  {id: 'loddon-mallee', region: 'Loddon Mallee / Murray', path: '/areas/loddon-mallee', file: 'areas/loddon-mallee.html', nav: 'Murray & Mallee', title: 'After-hours vets in the Murray and Mallee — Vet After Hours', h1: 'After-hours vets in the Murray and Mallee', description: describeArea, intro: loddonIntro},
+  {id: 'wimmera', region: 'Wimmera & South West', path: '/areas/wimmera', file: 'areas/wimmera.html', nav: 'Wimmera & South West', title: 'After-hours vets in the Wimmera and south-west — Vet After Hours', h1: 'After-hours vets in the Wimmera and south-west', description: describeArea, intro: wimmeraIntro},
+  {id: 'gippsland', region: 'Gippsland', path: '/areas/gippsland', file: 'areas/gippsland.html', nav: 'Gippsland', title: 'After-hours vets in Gippsland — Vet After Hours', h1: 'After-hours vets in Gippsland', description: describeArea, intro: gippslandIntro},
 ];
 
 const TWENTY_FOUR = {
@@ -136,6 +54,10 @@ export function clinicLastmod(clinic) {
 }
 
 export function openingHoursFor(clinic) {
+  const type = String(clinic.service_type || '');
+  // On-call, rotating and limited services have no schema opening hours unless a record
+  // has an explicit schedule encoded below. "24/7 on call" is not a staffed opening day.
+  if (type.includes('on_call') || type.includes('rotating') || type.includes('limited') || type === 'on_call' || type === 'rotating') return {};
   const text = `${clinic.public_hours || ''} ${clinic.published_hours_summary || ''}`;
   if (clinic.service_type === 'hospital_24h' && /24\s*hours|24\/7/i.test(text)) {
     return {
@@ -164,19 +86,24 @@ export function openingHoursFor(clinic) {
 
 export function generateSite({clinics, indexHtml}) {
   if (!Array.isArray(clinics) || !clinics.length) throw new Error('No clinic records');
-  const byId = new Map(clinics.map(c => [c.id, c]));
-  for (const area of AREAS) {
-    for (const id of area.clinicIds) {
-      if (!byId.has(id)) throw new Error(`Area ${area.id} references unknown clinic ${id}`);
+  for (const clinic of clinics) {
+    if (typeof clinic.existing_clients_only !== 'boolean') throw new Error(`existing_clients_only missing on ${clinic.id}`);
+    if (!clinic.region) throw new Error(`region missing on ${clinic.id}`);
+    if (!clinic.locality_coordinates || typeof clinic.locality_coordinates.lat !== 'number' || typeof clinic.locality_coordinates.lon !== 'number') {
+      throw new Error(`coordinates missing on ${clinic.id}`);
     }
   }
-  const assigned = AREAS.flatMap(area => area.clinicIds);
+  const areas = AREAS.map(area => {
+    const list = sortClinics(clinics.filter(clinic => clinic.region === area.region));
+    if (!list.length) throw new Error(`Area ${area.id} has no clinics`);
+    return {...area, clinics: list, clinicIds: list.map(clinic => clinic.id)};
+  });
+  const assigned = areas.flatMap(area => area.clinicIds);
   if (new Set(assigned).size !== assigned.length) throw new Error('A clinic is listed in more than one area');
-  const missing = clinics.filter(c => !assigned.includes(c.id)).map(c => c.id);
+  const missing = clinics.filter(clinic => !assigned.includes(clinic.id)).map(clinic => clinic.id);
   if (missing.length) throw new Error(`Clinics missing an area page: ${missing.join(', ')}`);
 
-  const areas = AREAS.map(area => ({...area, clinics: sortClinics(area.clinicIds.map(id => byId.get(id)))}));
-  const twentyFour = sortClinics(clinics.filter(c => c.service_type === 'hospital_24h'));
+  const twentyFour = sortClinics(clinics.filter(clinic => clinic.service_type === 'hospital_24h'));
   const pages = [
     ...areas.map(area => areaPage(area, areas)),
     twentyFourPage(twentyFour, areas),
@@ -188,13 +115,82 @@ export function generateSite({clinics, indexHtml}) {
     ...pages.map(page => ({path: page.path, lastmod: page.lastmod})),
   ];
   return {
-    areas: AREAS.map(area => ({id: area.id, path: area.path, nav: area.nav, clinicIds: [...area.clinicIds]})),
+    areas: areas.map(area => ({id: area.id, path: area.path, nav: area.nav, region: area.region, clinicIds: [...area.clinicIds]})),
     pages,
     entries,
     indexHtml: prerenderHomepage(indexHtml, clinics, areas),
     notFoundHtml: notFoundPage(areas),
     sitemap: sitemapXml(entries),
   };
+}
+
+function describeArea(list) {
+  const places = joinAnd([...new Set(list.map(c => c.suburb))]);
+  const noun = list.length === 1 ? 'service' : 'services';
+  return `${this.h1}. ${list.length} listed ${noun} in ${places}. Call before travelling. This page is not a complete list of local clinics.`;
+}
+
+function melbourneIntro(list) {
+  const moorabbin = list.find(c => c.id === 'aec-moorabbin');
+  const grouped = list.filter(c => c.id === 'aec-frankston' || c.id === 'gvh-werribee');
+  const sentences = [];
+  if (moorabbin) sentences.push(`${escapeHtml(moorabbin.name)} is listed in ${escapeHtml(moorabbin.suburb)}, the suburb on its street address.`);
+  if (grouped.length) sentences.push(`${escapeHtml(joinAnd(grouped.map(c => `${c.name} in ${c.suburb}`)))} ${grouped.length > 1 ? 'are' : 'is'} on this Melbourne page rather than a separate area page.`);
+  sentences.push(`${escapeHtml('Peninsula Vet Emergency & Referral Hospital')} in Mornington is on the <a href="/areas/mornington-peninsula">Mornington Peninsula</a> page.`);
+  sentences.push('This is not every emergency clinic in Melbourne. A suburb that is missing has not been surveyed for this directory.');
+  return `<p>The Melbourne section of this directory has ${list.length} published 24-hour veterinary hospitals: ${escapeHtml(joinAnd(list.map(c => `${c.name} (${c.suburb})`)))}.</p><p>${sentences.join(' ')}</p>`;
+}
+
+function morningtonIntro(list) {
+  const c = list[0];
+  return `<p>${escapeHtml(c.name)} in ${escapeHtml(c.suburb)} publishes round-the-clock emergency care at ${escapeHtml(formatAddress(c))}. It is a 24-hour hospital. The phone number in this directory is ${escapeHtml(formatPhone(c.phone))}.</p><p>Animal Emergency Centre Frankston stays on the <a href="/areas/melbourne">Melbourne</a> page. This is not every clinic on the Mornington Peninsula.</p>`;
+}
+
+function yarraIntro(list) {
+  const names = escapeHtml(joinAnd(list.map(c => `${c.name} in ${c.suburb}`)));
+  return `<p>Yarra Valley and outer-east listings are ${names}. Both publish an on-call vet. They are not 24-hour hospitals. Call before travelling.</p>`;
+}
+
+function geelongIntro(list) {
+  const bits = list.map(c => `${escapeHtml(c.name)} in ${escapeHtml(c.suburb)} (${escapeHtml(formatAddress(c))}, ${escapeHtml(formatPhone(c.phone))})`).join(' and ');
+  return `<p>The Geelong listings are ${list.length} published 24-hour hospitals: ${bits}. They are different clinics. This page cannot tell you which one can accept a patient.</p><p>On-call clinics in Colac are on the <a href="/areas/colac">Colac</a> page. No separate Surf Coast after-hours hospital is listed.</p>`;
+}
+
+function colacIntro(list) {
+  const names = escapeHtml(joinAnd(list.map(c => `${c.name} in ${c.suburb}`)));
+  return `<p>This page lists ${list.length} on-call clinics: ${names}. They are not published 24-hour hospitals. Call before travelling and confirm where to go.</p><p>Published 24-hour hospitals for this part of Victoria are on the <a href="/areas/geelong">Geelong</a> page.</p>`;
+}
+
+function ballaratIntro(list) {
+  const c = list[0];
+  return `<p>The Ballarat listing is ${escapeHtml(c.name)} at ${escapeHtml(formatAddress(c))}. It is a call-first after-hours pathway, not a published 24-hour hospital. Published hours: ${escapeHtml(withPeriod(c.published_hours_summary))}</p><p>${escapeHtml(publicNote(c))} This record has no directions link, because the clinic asks you to confirm the treatment location on the phone. The Geelong and Melbourne pages list the published 24-hour hospitals those overnight calls are directed toward.</p>`;
+}
+
+function bendigoIntro(list) {
+  const central = list.find(c => c.id === 'central-bendigo');
+  const towns = escapeHtml(joinAnd([...new Set(list.map(c => c.suburb))]));
+  return `<p>Bendigo and central Victorian listings on this page are in ${towns}. Central Veterinary Emergency is not a published 24-hour hospital. The other listings are separate on-call services.</p><p>${escapeHtml(central.name)} at ${escapeHtml(formatAddress(central))} uses ${escapeHtml(formatPhone(central.phone))}. ${escapeHtml(publicNote(central))} This record has no directions link, because the treatment location is confirmed when you call.</p>`;
+}
+
+function humeIntro(list) {
+  const towns = escapeHtml(joinAnd([...new Set(list.map(c => c.suburb))]));
+  return `<p>Hume and north-east listings are on-call services in ${towns}. None is a published 24-hour hospital. Call first and confirm where to go.</p><p>Family Vet Centre in Wodonga is listed for existing clients. Murray River Animal Hospital is on call until 10pm and shares that roster with Fur Life Albury.</p>`;
+}
+
+function loddonIntro(list) {
+  const towns = escapeHtml(joinAnd([...new Set(list.map(c => c.suburb))]));
+  return `<p>Murray and Mallee listings are in ${towns}. They are on-call or limited after-hours services, not published 24-hour hospitals.</p><p>Benetook Veterinary Clinic publishes weekend and public-holiday cover from 8:30am to 5pm only. It is not an overnight service.</p>`;
+}
+
+function wimmeraIntro(list) {
+  const towns = escapeHtml(joinAnd([...new Set(list.map(c => c.suburb))]));
+  return `<p>Wimmera and south-west listings are on-call services in ${towns}. They are not published 24-hour hospitals. Horsham Veterinary Hospital puts after-hours callers through to a triage service that can contact its on-call vets. The Vet Group publishes an on-call emergency team at Wollaston in Warrnambool and at Portland.</p>`;
+}
+
+function gippslandIntro(list) {
+  const towns = escapeHtml(joinAnd([...new Set(list.map(c => c.suburb))]));
+  const warragul = list.find(c => c.id === 'gippsland-warragul');
+  return `<p>Gippsland listings in this directory are in ${towns}. Gippsland Pet Emergency in ${escapeHtml(warragul.suburb)} publishes hours from Friday 6 pm to Monday 8 am, plus public holidays. The other listings are on-call, rotating or existing-client services, not one 24-hour hospital for the region.</p><p>Traralgon Veterinary Centre and Moe Veterinary Centre are existing clients only. Gippsland Veterinary Group is available to new clients; a telehealth fee can apply for new or inactive companion-animal clients. This is not every Gippsland town.</p>`;
 }
 
 function prerenderHomepage(indexHtml, clinics, areas) {
@@ -244,6 +240,7 @@ function areaPage(area, areas) {
   const body = `${crumbs([{href: '/', label: 'Directory'}, {label: area.nav}])}
 <h1>${escapeHtml(area.h1)}</h1>
 ${area.intro(area.clinics)}
+${clientsOnlyBanner(area.clinics)}
 ${CALLOUT}
 <h2>Listed services</h2>
 <div class="cards">${area.clinics.map(staticCard).join('')}</div>
@@ -313,7 +310,7 @@ function clinicPage(clinic, areas) {
     : `<p>This is the only ${escapeHtml(area.nav)} listing in the directory. <a href="${area.path}">Back to ${escapeHtml(area.nav)}</a>.</p>`;
   const roundTheClock = clinic.service_type === 'hospital_24h';
   const body = `${crumbs([{href: '/', label: 'Directory'}, {href: area.path, label: area.nav}, {label: clinic.name}])}
-<p><span class="badge">${escapeHtml(serviceLabel(clinic))}</span></p>
+<p>${badgeHtml(clinic)}</p>
 <h1>${escapeHtml(clinic.name)}</h1>
 <p class="lede">${escapeHtml(clinicLede(clinic))}</p>
 ${CALLOUT}
@@ -382,16 +379,26 @@ function staticCard(clinic) {
   const secondary = directions
     ? `<a class="button secondary" href="${escapeHtml(directions)}" target="_blank" rel="noopener noreferrer">Get directions</a>`
     : `<a class="button secondary" href="${escapeHtml(clinic.source_url)}" target="_blank" rel="noopener noreferrer">Clinic website</a>`;
-  return `<article class="card"><div class="card-top"><span class="badge">${escapeHtml(serviceLabel(clinic))}</span></div><h3><a href="/clinics/${escapeHtml(clinic.id)}">${escapeHtml(clinic.name)}</a></h3><p class="address">${escapeHtml(formatAddress(clinic))}</p>${hoursHtml(clinic)}<p class="details">Hours and availability may change, including on public holidays. Call the clinic to confirm before travelling.</p>${note ? `<p class="notice">${escapeHtml(note)}</p>` : ''}<div class="card-actions"><a class="button primary" href="tel:${escapeHtml(clinic.phone)}">Call ${escapeHtml(phone)}</a>${secondary}</div><p class="card-meta"><span>${escapeHtml(reviewMeta(clinic))}</span></p></article>`;
+  return `<article class="card"><div class="card-top">${badgeHtml(clinic)}</div><h3><a href="/clinics/${escapeHtml(clinic.id)}">${escapeHtml(clinic.name)}</a></h3><p class="address">${escapeHtml(formatAddress(clinic))}</p>${hoursHtml(clinic)}<p class="details">Hours and availability may change, including on public holidays. Call the clinic to confirm before travelling.</p>${note ? `<p class="notice">${escapeHtml(note)}</p>` : ''}<div class="card-actions"><a class="button primary" href="tel:${escapeHtml(clinic.phone)}">Call ${escapeHtml(phone)}</a>${secondary}</div><p class="card-meta"><span>${escapeHtml(reviewMeta(clinic))}</span></p></article>`;
 }
 
 function clinicLede(clinic) {
-  return `${clinic.name} is listed at ${formatAddress(clinic)}. The directory classifies it as ${article(serviceLabel(clinic))} ${lowerFirst(serviceLabel(clinic))}. ${reviewMeta(clinic)}. Call ${formatPhone(clinic.phone)} before travelling.`;
+  const access = clinic.existing_clients_only ? ' The clinic describes this after-hours service as existing clients only.' : '';
+  return `${clinic.name} is listed at ${formatAddress(clinic)}. The directory classifies it as ${article(serviceLabel(clinic))} ${lowerFirst(serviceLabel(clinic))}.${access} ${reviewMeta(clinic)}. Call ${formatPhone(clinic.phone)} before travelling.`;
 }
 
 function clinicDescription(clinic) {
   const hours = clinic.public_hours || clinic.published_hours_summary;
-  return `${clinic.name} — ${serviceLabel(clinic)} at ${formatAddress(clinic)}. ${withPeriod(hours)} Call ${formatPhone(clinic.phone)} before travelling.`;
+  const access = clinic.existing_clients_only ? ' Existing clients only.' : '';
+  return `${clinic.name} — ${serviceLabel(clinic)} at ${formatAddress(clinic)}. ${withPeriod(hours)}${access} Call ${formatPhone(clinic.phone)} before travelling.`;
+}
+
+function clientsOnlyBanner(list) {
+  const flagged = list.filter(c => c.existing_clients_only);
+  if (!flagged.length) return '';
+  const names = joinAnd(flagged.map(c => c.name));
+  const verb = flagged.length > 1 ? 'publish' : 'publishes';
+  return `<p><span class="badge clients-only">Existing clients only</span> ${escapeHtml(names)} ${verb} after-hours care for existing clients. Call the clinic if you are not sure that includes you.</p>`;
 }
 
 function collectionJsonLd(area, description, lastmod) {
@@ -504,7 +511,7 @@ ${jsonLd ? jsonLdScript(jsonLd) : ''}
 <main id="content" class="wrap info-page">
 ${body}
 </main>
-<footer class="footer wrap"><div><strong>vetafterhours.au</strong><p>Helping you find the next step.</p></div><div><a href="mailto:hello@vetafterhours.au">hello@vetafterhours.au</a><a href="/information">Privacy &amp; data sources</a></div><p class="pilot">Preview · Victoria pilot<br>Clinic coverage is still being checked.</p></footer>
+<footer class="footer wrap"><div><strong>vetafterhours.au</strong><p>Helping you find the next step.</p></div><div><a href="mailto:hello@vetafterhours.au">hello@vetafterhours.au</a><a href="/information">Privacy &amp; data sources</a></div><p class="pilot">Victoria<br>Website-checked listings. Not every town is covered.</p></footer>
 </body>
 </html>
 `;

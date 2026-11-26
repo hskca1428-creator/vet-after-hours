@@ -4,6 +4,13 @@
   "outputDirectory": "dist",
   "cleanUrls": true,
   "trailingSlash": false,
+  "redirects": [
+    {
+      "source": "/areas/warragul",
+      "destination": "/areas/gippsland",
+      "permanent": true
+    }
+  ],
   "headers": [
     {
       "source": "/(.*)",

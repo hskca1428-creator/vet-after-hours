@@ -1,3 +1,7 @@
+# Locator verification
+
+The notes below are the 15 September 2026 check. Clinic counts, the Mildura distance and the 24-hour filter count changed when regional records were added on 26 November 2026. `npm test` is the current check.
+
 # First locator verification — 15 September 2026
 
 Story: user selects a Victorian suburb or postcode, browser searches the local dataset, ranks clinic records by approximate suburb-centre distance, and presents direct contact links.

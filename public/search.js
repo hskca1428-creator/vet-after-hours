@@ -11,8 +11,15 @@ export function distanceKm(a,b) {
   const h = Math.sin(dlat/2)**2 + Math.cos(a.lat*r)*Math.cos(b.lat*r)*Math.sin(dlon/2)**2;
   return 6371 * 2 * Math.asin(Math.sqrt(Math.min(1,h)));
 }
+export function isPublished24Hour(clinic) {
+  return clinic.service_type === 'hospital_24h' && clinic.verification_status === 'website_checked';
+}
+/** After-hours filter: on-call, rotating, limited and any other non-hospital service type. */
+export function isAfterHoursListing(clinic) {
+  return clinic.service_type !== 'hospital_24h';
+}
 export function rankClinics(clinics, origin, filter='all') {
-  return clinics.filter(c => filter === 'all' || (filter === '24h' ? c.service_type === 'hospital_24h' && c.verification_status === 'website_checked' : c.service_type !== 'hospital_24h'))
+  return clinics.filter(c => filter === 'all' || (filter === '24h' ? isPublished24Hour(c) : filter === 'after' ? isAfterHoursListing(c) : false))
     .map(c => ({...c, distance:origin && c.locality_coordinates ? distanceKm(origin,c.locality_coordinates):null}))
     .sort((a,b) => origin ? (a.distance ?? Infinity)-(b.distance ?? Infinity) || a.name.localeCompare(b.name) : a.name.localeCompare(b.name));
 }
