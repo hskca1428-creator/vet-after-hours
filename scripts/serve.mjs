@@ -1,7 +1,7 @@
 import {createServer} from 'node:http';
 import {readFile} from 'node:fs/promises';
 import {extname, resolve, sep} from 'node:path';
-import {generateSite} from './pages.mjs';
+import {AREA_REDIRECTS, generateSite} from './pages.mjs';
 
 const root = resolve('public');
 const port = Number(process.env.PORT) || 4173;
@@ -24,6 +24,11 @@ createServer(async (req, res) => {
     try { pathname = decodeURIComponent(url.pathname); }
     catch { send(res, 400, 'Bad request', 'text/plain'); return; }
     if (pathname.length > 1 && pathname.endsWith('/')) pathname = pathname.slice(0, -1);
+    const redirect = AREA_REDIRECTS.find(item => item.source === pathname);
+    if (redirect) {
+      res.writeHead(301, {Location: redirect.destination, 'Cache-Control': 'no-store'}).end();
+      return;
+    }
     const site = await loadSite();
     if (pathname === '/' || pathname === '/index.html') { send(res, 200, site.indexHtml, 'text/html'); return; }
     if (pathname === '/sitemap.xml') { send(res, 200, site.sitemap, 'application/xml'); return; }

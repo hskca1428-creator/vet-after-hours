@@ -3,9 +3,9 @@
 Research date: 5 September 2026. Free public MVP; no accounts, advertising, sponsored rankings or monetization in this version.
 
 ## Deliverable
-14 service records in [public/data/clinics.json](../public/data/clinics.json), with official source URLs, contact numbers, service distinctions and review notes. This is a starting directory, not complete Victorian coverage. Website checks do not establish current patient intake or constitute telephone verification. No clinics were contacted.
+The September 2026 deliverable was 14 service records in [public/data/clinics.json](../public/data/clinics.json), with official source URLs, contact numbers, service distinctions and review notes. This is a starting directory, not complete Victorian coverage. Website checks do not establish current patient intake or constitute telephone verification. No clinics were contacted.
 
-The table below is the 5 September 2026 research snapshot. Its review column is historical. In the current `public/data/clinics.json`, all 14 records are `website_checked` (some hours were clarified on 19 September 2026). Use the JSON file, not this table, for the live status.
+The table below is the 5 September 2026 research snapshot. Its review column is historical. Those 14 records are `website_checked` in `public/data/clinics.json` (some hours were clarified on 19 September 2026). A 26 November 2026 regional pass added further website-checked records. Use the JSON file, not this table, for the live list.
 
 ## Initial directory
 | Service | Suburb | Published service | Review |
@@ -35,8 +35,23 @@ The table below is the 5 September 2026 research snapshot. Its review column is 
 - AEC Moorabbin is physically listed in Highett. Store service name and locality separately.
 - Null postcodes, coordinates, species and intake status are deliberately unknown, not negative answers.
 
-## Coverage still to research
-Mornington Peninsula, Melbourne north and outer east, Shepparton/Goulburn Valley, Wangaratta/Wodonga, Mildura, Horsham/Wimmera, Warrnambool/south-west Victoria and East Gippsland. These are research gaps, not claims that services do not exist.
+## Regional pass, 26 November 2026
+
+Official clinic websites were checked for regional Victoria. Confirmed after-hours, on-call, rotating and 24-hour services were added to `public/data/clinics.json`, with `region` and `existing_clients_only`.
+
+Not added, because the page was uncertain, thin, or not a separate service:
+
+- Your Family Vet, Horsham: the after-hours page does not say a local vet is rostered.
+- Shepparton and Kialla Veterinary Clinics: VetChat / local on-call wording was in the page source and not in the rendered emergencies text.
+- Grampians Vet, Hamilton: after-hours calls are answered by Vetriage, without a clear local attendance statement.
+- Seymour Veterinary Surgery: generic template text and no after-hours number. Victorian Central Vet Group in Seymour is listed instead.
+- GV Vets, Shepparton: no after-hours or on-call process on the homepage.
+- Bacchus Marsh: no official clinic website with current after-hours wording.
+- Ballarat Eureka / Ballarat Veterinary Practices roster: it overlaps the existing Ballarat pathway, and the published weekend location and after-midnight destination disagree. It was not added as a second Ballarat service.
+
+Maffra's own site prints postcode 3830. That postcode is omitted; Maffra's locality postcode is 3860. Sale's emergency page still mixes business hours into an after-hours line, so those clock times are omitted. Wangaratta Veterinary Clinic's Friday daytime closing time still conflicts between page sections, so Friday daytime hours are omitted.
+
+Towns checked with no qualifying official after-hours service included Benalla, Ararat, Castlemaine, Gisborne, Sunbury, Torquay, Stawell and Kilmore. Coverage is still not every Victorian clinic.
 
 Further official leads:
 - [VicVet Whittlesea](https://vicvet.au/): advertises 24/7 emergency; complete address verification.
