@@ -3,7 +3,9 @@
 Research date: 5 September 2026. Free public MVP; no accounts, advertising, sponsored rankings or monetization in this version.
 
 ## Deliverable
-14 service records in [the JSON seed](data/victoria-clinics.seed.json), with official source URLs, contact numbers, service distinctions and review notes. This is a starting directory, not complete Victorian coverage. Website checks do not establish current patient intake or constitute telephone verification. No clinics were contacted.
+14 service records in [public/data/clinics.json](../public/data/clinics.json), with official source URLs, contact numbers, service distinctions and review notes. This is a starting directory, not complete Victorian coverage. Website checks do not establish current patient intake or constitute telephone verification. No clinics were contacted.
+
+The table below is the 5 September 2026 research snapshot. Its review column is historical. In the current `public/data/clinics.json`, all 14 records are `website_checked` (some hours were clarified on 19 September 2026). Use the JSON file, not this table, for the live status.
 
 ## Initial directory
 | Service | Suburb | Published service | Review |
