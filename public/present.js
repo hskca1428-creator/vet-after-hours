@@ -18,6 +18,8 @@ const PUBLIC_NOTES = {
   'moe-veterinary-centre': 'No separate after-hours number is published. Call the clinic.',
   'gvg-after-hours-pathway': 'Call the nearest GVG clinic and press 1 for pets or 2 for livestock or equine. Companion-animal after-hours runs from Leongatha and/or Wonthaggi. New or inactive companion-animal clients may be charged a telehealth fee. Active clients are not charged for the initial phone consultation. Clinics are not staffed on site 24/7.',
   'murray-river-animal-hospital-wodonga': 'Local vets are on call until 10pm, on a roster shared with Fur Life Albury. After 10pm the page does not name a Victorian 24-hour hospital. Do not arrive after hours without calling.',
+  'veca-norwest': 'VECA’s general practice services will close on 1 December 2026. Our 24/7 emergency and specialist care continues as normal.',
+  'veca-campbelltown': 'VECA’s general practice services will close on 1 December 2026. Our 24/7 emergency and specialist care continues as normal.',
   'eastwood-mainst-bairnsdale-pathway': 'Shared roster with Main Street Veterinary Clinic. Confirm which clinic is on duty. Main Street publishes a separate out-of-hours number, (03) 5152 6666.',
 };
 
@@ -62,7 +64,8 @@ export function schemaTelephone(phone) {
 
 export function formatAddress(c) {
   const postcode = c.postcode ? ` ${c.postcode}` : '';
-  return `${c.address}, ${c.suburb} VIC${postcode}`;
+  const state = c.state || '';
+  return `${c.address}, ${c.suburb}${state ? ` ${state}` : ''}${postcode}`;
 }
 
 export function serviceLabel(c) {

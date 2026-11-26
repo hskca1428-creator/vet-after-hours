@@ -1,13 +1,24 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
-import {formatPhone, schemaTelephone, serviceLabel} from '../public/present.js';
+import {scheduledOpenStatus} from '../public/hours.js';
+import {formatAddress, formatPhone, schemaTelephone, serviceLabel} from '../public/present.js';
 import {matchSuburbs,rankClinics,directionsUrl,distanceKm} from '../public/search.js';
 const suburbs=JSON.parse(readFileSync(new URL('../public/data/suburbs.json',import.meta.url)));
 const {clinics}=JSON.parse(readFileSync(new URL('../public/data/clinics.json',import.meta.url)));
 test('finds suburb names, exact rendered selections and shared postcodes',()=>{
  assert.equal(matchSuburbs(suburbs,'Richmond')[0].name,'Richmond');
  assert.equal(matchSuburbs(suburbs,'Richmond, VIC 3121')[0].postcode,'3121');
+ assert.equal(matchSuburbs(suburbs,'Richmond, VIC 3121')[0].state,'VIC');
+ const richmond = matchSuburbs(suburbs,'Richmond');
+ assert.ok(richmond.some(s => s.state==='VIC' && s.postcode==='3121'));
+ assert.ok(richmond.some(s => s.state==='NSW' && s.postcode==='2753'));
+ assert.equal(matchSuburbs(suburbs,'3000')[0].name,'Melbourne');
+ assert.equal(matchSuburbs(suburbs,'3000')[0].state,'VIC');
+ const crows = matchSuburbs(suburbs,'2065');
+ assert.ok(crows.length>1);
+ assert.ok(crows.every(s => s.state==='NSW'));
+ assert.ok(matchSuburbs(suburbs,'2150').some(s => s.name==='Parramatta' && s.state==='NSW' && s.postcode==='2150'));
  assert.ok(matchSuburbs(suburbs,'3068').length>1);
  assert.equal(matchSuburbs(suburbs,'zzzxunknown').length,0);
  assert.equal(matchSuburbs(suburbs,'').length,0);
@@ -28,6 +39,16 @@ test('distances are symmetrical, zero at origin, and Geelong results come first 
  assert.equal(distanceKm(a,a),0);assert.ok(Math.abs(distanceKm(a,b)-distanceKm(b,a))<.001);
  const origin=matchSuburbs(suburbs,'South Geelong')[0];
  assert.equal(rankClinics(clinics,origin)[0].id,'geelong-emergency');
+ const melbourne=matchSuburbs(suburbs,'3000')[0];
+ assert.equal(rankClinics(clinics,melbourne)[0].state,'VIC');
+ const parramatta=matchSuburbs(suburbs,'2150').find(s => s.name==='Parramatta');
+ const nearParra=rankClinics(clinics,parramatta)[0];
+ assert.equal(nearParra.state,'NSW');
+ assert.ok(nearParra.distance<25, `${nearParra.id} ${nearParra.distance}`);
+ const crowsNest=matchSuburbs(suburbs,'2065').find(s => s.name==='Crows Nest');
+ const nearCrows=rankClinics(clinics,crowsNest)[0];
+ assert.equal(nearCrows.state,'NSW');
+ assert.ok(nearCrows.distance<15, `${nearCrows.id} ${nearCrows.distance}`);
 });
 test('24-hour filter excludes unreviewed hours',()=>{
  const filtered=rankClinics(clinics,null,'24h');assert.ok(filtered.length);
@@ -53,12 +74,23 @@ test('unresolved and rotating destinations never produce directions',()=>{
  for(const c of clinics.filter(c=>c.verification_status==='needs_review'||c.service_type.includes('rotating')||c.service_type.includes('on_call')))assert.equal(directionsUrl(c),null);
  assert.ok(directionsUrl(clinics.find(c=>c.id==='benetook-veterinary-clinic-mildura')).includes('Benetook'));
  assert.ok(directionsUrl(clinics.find(c=>c.id==='advanced-kensington')).startsWith('https://www.google.com/maps/dir/?api=1&destination='));
+ const alexandria=directionsUrl(clinics.find(c=>c.id==='sash-alexandria'));
+ assert.match(alexandria, /NSW/);
+ assert.equal(alexandria.includes('VIC'), false);
+ assert.match(formatAddress(clinics.find(c=>c.id==='sash-alexandria')), /Alexandria NSW 2015/);
+ assert.match(formatAddress(clinics.find(c=>c.id==='advanced-kensington')), /Kensington VIC 3031/);
 });
 test('data has unique IDs, valid phone links and no invented real-time status',()=>{
  assert.equal(new Set(clinics.map(c=>c.id)).size,clinics.length);
- for(const c of clinics){assert.match(c.phone,/^(0\d{9}|1300\d{6}|1800\d{6})$/);assert.equal(c.accepting_patients_now,null);assert.equal(c.automated_open_now_enabled,false);assert.equal(c.state,'VIC');assert.equal(typeof c.existing_clients_only,'boolean');assert.ok(c.region);assert.equal(c.coordinate_precision,'suburb_centroid');assert.equal(typeof c.locality_coordinates.lat,'number');}
+ for(const c of clinics){assert.match(c.phone,/^(0\d{9}|1300\d{6}|1800\d{6})$/);assert.equal(c.accepting_patients_now,null);assert.equal(c.automated_open_now_enabled,false);assert.equal(typeof c.existing_clients_only,'boolean');assert.ok(c.region);assert.equal(c.coordinate_precision,'suburb_centroid');assert.equal(typeof c.locality_coordinates.lat,'number');assert.ok(c.state==='VIC'||c.state==='NSW');assert.equal(c.timezone,c.state==='NSW'?'Australia/Sydney':'Australia/Melbourne');}
  const clientsOnly=clinics.filter(c=>c.existing_clients_only).map(c=>c.id).sort();
  assert.deepEqual(clientsOnly,['family-vet-centre-wodonga','moe-veterinary-centre','traralgon-veterinary-centre']);
+ assert.equal(clinics.filter(c=>c.state==='NSW').length,17);
+ assert.equal(clinics.filter(c=>c.state==='VIC').length,42);
+ assert.equal(clinics.some(c=>c.id==='arh-baulkham-hills'),false);
+ for(const id of ['veca-norwest','veca-campbelltown']) assert.match(clinics.find(c=>c.id===id).notes,/1 December 2026/);
+ assert.equal(suburbs.filter(s=>s.state==='VIC').length,2933);
+ assert.equal(suburbs.filter(s=>s.state==='NSW').length,1317);
  const milduraSuburb=suburbs.find(s=>s.name==='Mildura'&&s.postcode==='3500');
  assert.deepEqual(clinics.find(c=>c.id==='mildura-veterinary-hospital').locality_coordinates,{lat:milduraSuburb.lat,lon:milduraSuburb.lon});
  const maffra=clinics.find(c=>c.id==='gippsland-vet-hospital-maffra');
@@ -66,6 +98,15 @@ test('data has unique IDs, valid phone links and no invented real-time status',(
  assert.equal(maffra.locality_coordinates.lat,suburbs.find(s=>s.name==='Maffra').lat);
  for(const id of ['your-family-vet-horsham','shepparton-kialla-vets'])assert.equal(clinics.some(c=>c.id===id),false);
  assert.equal(JSON.stringify(clinics).includes('Eureka Veterinary'),false);
- assert.ok(suburbs.every(s=>s.lat<0&&s.lon>0&&/^\d{4}$/.test(s.postcode)));
+ assert.ok(suburbs.every(s=>s.lat<0&&s.lon>0&&/^\d{4}$/.test(s.postcode)&&(s.state==='VIC'||s.state==='NSW')));
+ const fridayEvening=new Date('2026-11-27T07:30:00Z');
+ const gippsland={...clinics.find(c=>c.id==='gippsland-warragul'),automated_open_now_enabled:true};
+ assert.equal(scheduledOpenStatus(gippsland,fridayEvening),true);
+ assert.equal(scheduledOpenStatus({...gippsland,timezone:'Australia/Sydney'},fridayEvening),true);
+ assert.equal(scheduledOpenStatus({...gippsland,timezone:'Australia/Perth'},fridayEvening),false);
+ assert.equal(scheduledOpenStatus({...gippsland,automated_open_now_enabled:false},fridayEvening),null);
+ assert.equal(scheduledOpenStatus(clinics.find(c=>c.id==='advanced-kensington'),fridayEvening),null);
+ assert.equal(scheduledOpenStatus({...clinics.find(c=>c.id==='sash-north-ryde'),automated_open_now_enabled:true},fridayEvening),true);
+ assert.equal(scheduledOpenStatus({...clinics.find(c=>c.id==='nevs-terrey-hills'),automated_open_now_enabled:true},fridayEvening),null);
 });
 
