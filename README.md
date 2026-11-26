@@ -12,7 +12,7 @@ npm test
 npm run build
 ```
 
-Preview: http://127.0.0.1:4173. Build output: dist/. Vercel configuration is included; framework preset Other, build npm run build, output dist.
+Preview: http://127.0.0.1:4173. The dev server also serves generated clinic pages, area pages, the sitemap and the 404 page. Build output: dist/. Vercel configuration is included; framework preset Other, build npm run build, output dist, cleanUrls on, trailingSlash off.
 
 ## Current behavior
 
@@ -25,14 +25,26 @@ Preview: http://127.0.0.1:4173. Build output: dist/. Vercel configuration is inc
 
 ## Important limits before public launch
 
-- Production indexing is enabled. Canonical URLs use https://www.vetafterhours.au and public/sitemap.xml lists the public pages.
+- Production indexing is enabled. Canonical URLs use https://www.vetafterhours.au. The build writes dist/sitemap.xml, with lastmod taken from each clinic’s review dates, and public/robots.txt points at that sitemap.
 - Coverage is incomplete. Do not advertise comprehensive Victoria-wide service coverage.
-- Clinic data was website-reviewed on 5 September 2026. Six records require further review. No telephone verification or live intake status.
+- All 14 clinic records are website-checked. The first website review was 5 September 2026; some published hours were clarified on 19 September 2026. No telephone verification or live intake status.
 - Coordinates refer to suburb centres, not clinic street entrances. Distances are approximate straight-line estimates. Geocode actual treatment addresses before claiming nearest-clinic precision.
 - Geolocation uses proximity to Victorian localities as a coarse service-area check, not a legal state-boundary polygon.
 - Species eligibility and public-holiday schedules need confirmation. No automated open-now badge is implemented.
 - No analytics, newsletters, third-party AI calls or accounts have been enabled.
 - Review public privacy wording against actual hosting and email handling before launch.
+
+## Pages
+
+`npm run build` copies public/ to dist/ and generates the crawlable HTML:
+
+- Prerendered homepage, so clinic names, suburbs, phone numbers, service types and hours are in the file before JavaScript runs. Suburb search, filters and geolocation still replace that list after app.js loads.
+- One page per clinic at /clinics/<id>.
+- Area pages at /areas/melbourne, /areas/geelong, /areas/ballarat, /areas/bendigo and /areas/warragul.
+- /24-hour-emergency-vets for the published round-the-clock hospitals.
+- dist/sitemap.xml and dist/404.html.
+
+Vercel serves the extensionless paths via cleanUrls and uses dist/404.html for unknown URLs.
 
 ## Data maintenance
 
