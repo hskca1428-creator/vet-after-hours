@@ -32,7 +32,11 @@ export function openingHoursFor(clinic) {
   return {};
 }
 
-/** Wall-clock parts in an IANA timezone. Returns null if the timezone is missing or invalid. */
+/**
+ * Wall-clock parts in an IANA timezone. Returns null if the timezone is missing or invalid.
+ * Australia/Brisbane does not observe daylight saving, so it stays on AEST (UTC+10) while
+ * Australia/Sydney and Australia/Melbourne are on AEDT (UTC+11).
+ */
 export function zonedDateTime(timeZone, date = new Date()) {
   if (!timeZone || typeof timeZone !== 'string') return null;
   let parts;

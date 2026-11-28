@@ -19,6 +19,11 @@
       "source": "/nsw",
       "destination": "/states/nsw",
       "permanent": true
+    },
+    {
+      "source": "/qld",
+      "destination": "/states/qld",
+      "permanent": true
     }
   ],
   "headers": [

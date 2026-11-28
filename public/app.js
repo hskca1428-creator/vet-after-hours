@@ -9,7 +9,7 @@ function suggest(){
  state.matches=matchSuburbs(state.suburbs,$('suburb').value); state.active=-1;
  $('suggestions').innerHTML=state.matches.map((s,i)=>`<li id="option-${i}" role="option" aria-selected="false" data-index="${i}">${escape(s.name)}<span>${escape(s.state)} ${escape(s.postcode)}</span></li>`).join('');
  $('suggestions').hidden=!state.matches.length; $('suburb').setAttribute('aria-expanded',String(!!state.matches.length)); $('suburb').removeAttribute('aria-activedescendant');
- if($('suburb').value.trim() && !state.matches.length) $('search-message').textContent='No matching suburb in Victoria or Greater Sydney. Try the full suburb name or a postcode.'; else $('search-message').textContent='';
+ if($('suburb').value.trim() && !state.matches.length) $('search-message').textContent='No matching suburb in Victoria, Greater Sydney or South East Queensland. Try the full suburb name or a postcode.'; else $('search-message').textContent='';
 }
 function selectSuburb(s){ state.origin={lat:s.lat,lon:s.lon};state.label=`${s.name}, ${s.state} ${s.postcode}`;state.limit=5;$('suburb').value=state.label;closeSuggestions();$('search-message').textContent='';render();$('results-title').focus({preventScroll:true});$('results-title').scrollIntoView({behavior:'smooth',block:'start'}); }
 function card(c){
@@ -29,7 +29,7 @@ function render(){
  $('results-summary').textContent=state.origin?`${rows.length} listed services · Ordered by approximate distance between suburb centres`:`${rows.length} listed services · Choose a suburb to sort by approximate distance`;
  $('reset').hidden=!state.origin;
  const nearest=rows.find(c=>c.distance!==null)?.distance;
- $('coverage-note').textContent=state.origin && nearest>50?`Our closest listed service is approximately ${Math.round(nearest)} km away, measured between suburb centres. Not every town is covered, so a closer service may be missing. Call your regular vet for its after-hours arrangements.`:'Listings for Victoria and Greater Sydney, checked from clinic websites. Victorian regional towns and Greater Sydney clinics were reviewed on 26 November 2026. Not every town is covered, and other states are not listed yet. Call to confirm availability. Distances are approximate straight-line estimates between suburb centres, not driving distances.';
+ $('coverage-note').textContent=state.origin && nearest>50?`Our closest listed service is approximately ${Math.round(nearest)} km away, measured between suburb centres. Not every town is covered, so a closer service may be missing. Call your regular vet for its after-hours arrangements.`:'Listings for Victoria, Greater Sydney and South East Queensland (Brisbane, Gold Coast and Sunshine Coast), checked from clinic websites. Victorian regional towns and Greater Sydney clinics were reviewed on 26 November 2026. South East Queensland clinics were reviewed on 28 November 2026. Not every town is covered, and other states are not listed yet. Call to confirm availability. Distances are approximate straight-line estimates between suburb centres, not driving distances.';
  $('results').innerHTML=rows.length?rows.slice(0,state.limit).map(card).join(''):'<div class="empty"><h3>No services in this category</h3><p>Try All services. Our directory is still growing, so an empty result does not mean care is unavailable.</p></div>';
  $('results').setAttribute('aria-busy','false');$('show-more').hidden=rows.length<=state.limit;
  $('show-more').textContent=`Show more clinics (${Math.max(0,rows.length-state.limit)} remaining)`;
@@ -56,7 +56,7 @@ $('search-form').addEventListener('submit',e=>{
  if(exact.length===1)selectSuburb(exact[0]);
  else if(nameHits.length===1)selectSuburb(nameHits[0]);
  else if(found.length===1)selectSuburb(found[0]);
- else{suggest();$('suburb').focus();$('search-message').textContent=found.length?'Select your suburb from the suggestions. The same name can exist in more than one state.':'Enter a suburb or postcode in Victoria or Greater Sydney.';}
+ else{suggest();$('suburb').focus();$('search-message').textContent=found.length?'Select your suburb from the suggestions. The same name can exist in more than one state.':'Enter a suburb or postcode in Victoria, Greater Sydney or South East Queensland.';}
 });
 document.querySelectorAll('[data-filter]').forEach(b=>b.addEventListener('click',()=>{state.filter=b.dataset.filter;state.limit=5;document.querySelectorAll('[data-filter]').forEach(x=>x.setAttribute('aria-pressed',String(x===b)));if(state.ready)render();}));
 $('show-more').addEventListener('click',()=>{state.limit+=5;render();});
@@ -67,7 +67,7 @@ $('locate').addEventListener('click',()=>{
  navigator.geolocation.getCurrentPosition(pos=>{
   $('locate').disabled=false;const origin={lat:pos.coords.latitude,lon:pos.coords.longitude};
   const nearest=state.suburbs.reduce((a,b)=>distanceKm(origin,a)<distanceKm(origin,b)?a:b);
-  if(distanceKm(origin,nearest)>50){$('search-message').textContent='Your location appears outside Victoria and Greater Sydney, the areas this directory currently covers. Enter a suburb or postcode there instead.';return;}
+  if(distanceKm(origin,nearest)>50){$('search-message').textContent='Your location appears outside Victoria, Greater Sydney and South East Queensland, the areas this directory currently covers. Enter a suburb or postcode there instead.';return;}
   state.origin=origin;state.label='your location';state.limit=5;$('suburb').value='';closeSuggestions();$('search-message').textContent='Location used only in this browser. Distances are estimates to clinic suburb centres.';render();
  },err=>{$('locate').disabled=false;$('search-message').textContent=err.code===1?'Location permission was not granted. Enter your suburb instead.':'We couldn’t determine your location. Enter your suburb instead.';},{timeout:10000,maximumAge:60000,enableHighAccuracy:false});
 });
@@ -78,6 +78,6 @@ try{
  for(const id of ['suburb','find','locate'])$(id).disabled=false;$('search-message').textContent='';render();
 }catch{
  $('search-message').textContent='The directory could not load. Please reload the page or use the clinic links below.';$('results-summary').textContent='Directory temporarily unavailable';$('results').setAttribute('aria-busy','false');
- $('results').innerHTML='<div class="empty"><h3>Contact a provider directly</h3><p>You can call Advanced Vetcare Kensington on 03 9092 0400 or SASH North Ryde on 02 9889 0289. Confirm availability before travelling.</p><a class="button primary" href="tel:0390920400">Call 03 9092 0400</a> <a class="button secondary" href="tel:0298890289">Call 02 9889 0289</a></div>';
+ $('results').innerHTML='<div class="empty"><h3>Contact a provider directly</h3><p>You can call Advanced Vetcare Kensington on 03 9092 0400, SASH North Ryde on 02 9889 0289, or Pet Emergency Stafford on 07 3359 0777. Confirm availability before travelling.</p><a class="button primary" href="tel:0390920400">Call 03 9092 0400</a> <a class="button secondary" href="tel:0298890289">Call 02 9889 0289</a> <a class="button secondary" href="tel:0733590777">Call 07 3359 0777</a></div>';
 }
 

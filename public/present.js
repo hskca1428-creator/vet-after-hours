@@ -21,6 +21,7 @@ const PUBLIC_NOTES = {
   'veca-norwest': 'VECA’s general practice services will close on 1 December 2026. Our 24/7 emergency and specialist care continues as normal.',
   'veca-campbelltown': 'VECA’s general practice services will close on 1 December 2026. Our 24/7 emergency and specialist care continues as normal.',
   'eastwood-mainst-bairnsdale-pathway': 'Shared roster with Main Street Veterinary Clinic. Confirm which clinic is on duty. Main Street publishes a separate out-of-hours number, (03) 5152 6666.',
+  'aec-noosa': 'Walk-in urgent care with set evening and weekend hours. Not overnight cover and not a 24-hour hospital.',
 };
 
 export function escapeHtml(value) {
