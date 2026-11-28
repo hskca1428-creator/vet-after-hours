@@ -62,7 +62,7 @@ Further official leads:
 
 ## Data rules for the build
 1. Official clinic branch pages take priority over generic directory listings. Preserve conflicting evidence for review.
-2. Use each clinic’s IANA timezone (Australia/Melbourne for Victoria, Australia/Sydney for New South Wales, Australia/Brisbane for Queensland). Queensland does not observe daylight saving, so a Brisbane clinic stays on Australian Eastern Standard Time when Sydney and Melbourne are on AEDT. Model schedules crossing midnight and public-holiday exceptions explicitly. Do not assume one state clock for every record.
+2. Use each clinic’s IANA timezone (Australia/Melbourne for Victoria, Australia/Sydney for New South Wales, Australia/Brisbane for Queensland, Australia/Perth for Western Australia). Queensland and Western Australia do not observe daylight saving. A Brisbane clinic stays on Australian Eastern Standard Time (UTC+10) when Sydney and Melbourne are on AEDT (UTC+11). A Perth clinic stays on Australian Western Standard Time (UTC+8), three hours behind Melbourne during AEDT and two hours behind Brisbane. Model schedules crossing midnight and public-holiday exceptions explicitly. Do not assume one state clock for every record.
 3. Only calculate scheduled-open status from reviewed structured hours; never call this live availability. All seed records currently disable this calculation.
 4. Leave unknown details null. Do not invent distances, travel times, species eligibility or wait times.
 5. Support both website_checked and clinic_confirmed verification with separate dates. Display the actual level of verification.

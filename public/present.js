@@ -22,6 +22,9 @@ const PUBLIC_NOTES = {
   'veca-campbelltown': 'VECA’s general practice services will close on 1 December 2026. Our 24/7 emergency and specialist care continues as normal.',
   'eastwood-mainst-bairnsdale-pathway': 'Shared roster with Main Street Veterinary Clinic. Confirm which clinic is on duty. Main Street publishes a separate out-of-hours number, (03) 5152 6666.',
   'aec-noosa': 'Walk-in urgent care with set evening and weekend hours. Not overnight cover and not a 24-hour hospital.',
+  'baldivis-emergency-vet': 'Published hours conflict: the emergency page lists 6pm–8am, and the site also calls itself a 24-hour hospital. Call to confirm daytime cover.',
+  'aec-midland': 'Overnight cover is not confirmed. The hours widget ends at midnight. Call ahead before travelling.',
+  'aes-osborne-park': 'Postcode 6017 is inferred from the Osborne Park locality. The clinic page does not print a postcode.',
 };
 
 export function escapeHtml(value) {

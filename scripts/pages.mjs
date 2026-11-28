@@ -23,12 +23,13 @@ export const AREA_REDIRECTS = [
   {source: '/vic', destination: '/states/vic'},
   {source: '/nsw', destination: '/states/nsw'},
   {source: '/qld', destination: '/states/qld'},
+  {source: '/wa', destination: '/states/wa'},
 ];
 
-const HOME_TITLE = 'Vet After Hours — Find an after-hours vet in Victoria, Greater Sydney and South East Queensland';
-const HOME_DESCRIPTION = 'Find after-hours veterinary services in Victoria, Greater Sydney and South East Queensland (Brisbane, Gold Coast, Sunshine Coast). Search your suburb, check published details and call a clinic. Free to use. Other states are not covered yet.';
+const HOME_TITLE = 'Vet After Hours — Find an after-hours vet in Victoria, Greater Sydney, South East Queensland and Greater Perth';
+const HOME_DESCRIPTION = 'Find after-hours veterinary services in Victoria, Greater Sydney, South East Queensland (Brisbane, Gold Coast, Sunshine Coast) and Greater Perth. Search your suburb, check published details and call a clinic. Free to use. Other states are not covered yet.';
 const CALLOUT = '<div class="callout"><span class="info-icon" aria-hidden="true">i</span><p><strong>Please call before travelling.</strong> Published hours don’t guarantee a clinic can accept your pet. Confirm availability and the treatment location directly.</p></div>';
-const STATE_NAME = {VIC: 'Victoria', NSW: 'New South Wales', QLD: 'Queensland'};
+const STATE_NAME = {VIC: 'Victoria', NSW: 'New South Wales', QLD: 'Queensland', WA: 'Western Australia'};
 
 const VIC_AREAS = [
   {id: 'melbourne', state: 'VIC', region: 'Melbourne', path: '/areas/melbourne', file: 'areas/melbourne.html', nav: 'Melbourne', title: 'Emergency vets in Melbourne — Vet After Hours', h1: 'After-hours vets in Melbourne', description: describeArea, intro: melbourneIntro},
@@ -66,18 +67,30 @@ const QLD_REGIONS = [
   'Sunshine Coast',
 ];
 
+/** Region strings from the Greater Perth clinic records, in browse order. Slugs come from these names. */
+const WA_REGIONS = [
+  'Perth North & Joondalup',
+  'Perth Inner & North-Central',
+  'Perth South & Fremantle',
+  'Perth South East & Hills',
+  'Perth North East & Swan',
+  'Rockingham & Kwinana',
+  'Peel & Mandurah',
+];
+
 const STATES = [
   {id: 'vic', code: 'VIC', path: '/states/vic', file: 'states/vic.html', nav: 'Victoria', title: 'After-hours vets in Victoria — Vet After Hours', h1: 'After-hours vets in Victoria', intro: vicStateIntro},
   {id: 'nsw', code: 'NSW', path: '/states/nsw', file: 'states/nsw.html', nav: 'Greater Sydney, NSW', title: 'After-hours vets in Greater Sydney, NSW — Vet After Hours', h1: 'After-hours vets in Greater Sydney, NSW', intro: nswStateIntro},
   {id: 'qld', code: 'QLD', path: '/states/qld', file: 'states/qld.html', nav: 'South East Queensland', title: 'After-hours vets in South East Queensland — Vet After Hours', h1: 'After-hours vets in South East Queensland', intro: qldStateIntro},
+  {id: 'wa', code: 'WA', path: '/states/wa', file: 'states/wa.html', nav: 'Greater Perth, WA', title: 'After-hours vets in Greater Perth, WA — Vet After Hours', h1: 'After-hours vets in Greater Perth, WA', intro: waStateIntro},
 ];
 
 const TWENTY_FOUR = {
   path: '/24-hour-emergency-vets',
   file: '24-hour-emergency-vets.html',
   nav: '24-hour emergency vets',
-  title: '24-hour emergency vets in Victoria, Greater Sydney and South East Queensland — Vet After Hours',
-  h1: '24-hour emergency vets in Victoria, Greater Sydney and South East Queensland',
+  title: '24-hour emergency vets in Victoria, Greater Sydney, South East Queensland and Greater Perth — Vet After Hours',
+  h1: '24-hour emergency vets in Victoria, Greater Sydney, South East Queensland and Greater Perth',
 };
 
 function areaSlug(region) {
@@ -110,8 +123,12 @@ function qldAreaDefinitions() {
   return regionAreaDefinitions(QLD_REGIONS, 'QLD', qldIntro);
 }
 
+function waAreaDefinitions() {
+  return regionAreaDefinitions(WA_REGIONS, 'WA', waIntro);
+}
+
 function allAreaDefs() {
-  const areas = [...VIC_AREAS, ...nswAreaDefinitions(), ...qldAreaDefinitions()];
+  const areas = [...VIC_AREAS, ...nswAreaDefinitions(), ...qldAreaDefinitions(), ...waAreaDefinitions()];
   const ids = areas.map(area => area.id);
   if (new Set(ids).size !== ids.length) throw new Error(`Area slug collision: ${ids.join(', ')}`);
   return areas;
@@ -184,7 +201,7 @@ function nswIntro(list) {
     return `${lead}<p>${hospitals.length === 1 ? 'This clinic publishes' : 'These clinics publish'} round-the-clock emergency care. Call before travelling. This is not every clinic in the area, and other parts of New South Wales are not listed.</p>`;
   }
   if (!hospitals.length) {
-    return `${lead}<p>${list.length === 1 ? 'This listing is' : 'These listings are'} not a published 24-hour hospital. Call before travelling and confirm where to go. Published 24-hour hospitals in Victoria, Greater Sydney and South East Queensland are on the <a href="${TWENTY_FOUR.path}">24-hour emergency vets</a> page.</p>`;
+    return `${lead}<p>${list.length === 1 ? 'This listing is' : 'These listings are'} not a published 24-hour hospital. Call before travelling and confirm where to go. Published 24-hour hospitals in Victoria, Greater Sydney, South East Queensland and Greater Perth are on the <a href="${TWENTY_FOUR.path}">24-hour emergency vets</a> page.</p>`;
   }
   return `${lead}<p>${escapeHtml(joinAnd(hospitals.map(c => c.name)))} ${hospitals.length === 1 ? 'publishes' : 'publish'} round-the-clock emergency care. ${escapeHtml(joinAnd(others.map(c => c.name)))} ${others.length === 1 ? 'is listed' : 'are listed'} from published after-hours hours, not as a 24-hour hospital. Call before travelling.</p>`;
 }
@@ -210,24 +227,53 @@ function qldIntro(list) {
   return `${lead}<p>${bits.join(' ')}</p>`;
 }
 
+function waIntro(list) {
+  const places = escapeHtml(joinAnd([...new Set(list.map(c => c.suburb))]));
+  const names = escapeHtml(joinAnd(list.map(c => `${c.name} in ${c.suburb}`)));
+  const hospitals = list.filter(c => c.service_type === 'hospital_24h');
+  const others = list.filter(c => c.service_type !== 'hospital_24h');
+  const lead = `<p>Greater Perth listings for this area: ${names}. ${list.length === 1 ? 'The suburb on this page is' : 'Suburbs on this page are'} ${places}.</p>`;
+  const bits = [];
+  if (hospitals.length && !others.length) {
+    bits.push(`${hospitals.length === 1 ? 'This clinic publishes' : 'These clinics publish'} round-the-clock emergency care.`);
+  } else {
+    if (hospitals.length) bits.push(`${escapeHtml(joinAnd(hospitals.map(c => c.name)))} ${hospitals.length === 1 ? 'publishes' : 'publish'} round-the-clock emergency care.`);
+    if (others.length) bits.push(`${escapeHtml(joinAnd(others.map(c => c.name)))} ${others.length === 1 ? 'is listed' : 'are listed'} from published after-hours hours, not as a 24-hour hospital.`);
+  }
+  const baldivis = list.find(c => c.id === 'baldivis-emergency-vet');
+  if (baldivis) bits.push(`${escapeHtml(baldivis.name)} publishes conflicting hours: the emergency page lists 6pm–8am, and the site also calls itself a 24-hour hospital. Call to confirm daytime cover.`);
+  const midland = list.find(c => c.id === 'aec-midland');
+  if (midland) bits.push(`${escapeHtml(midland.name)} is not confirmed overnight. The published hours widget ends at midnight.`);
+  const osborne = list.find(c => c.id === 'aes-osborne-park');
+  if (osborne) bits.push(`The ${escapeHtml(osborne.name)} page does not print a postcode. 6017 is inferred from the Osborne Park locality.`);
+  bits.push('Call before travelling. This is not every clinic in the area, and other parts of Western Australia are not listed.');
+  return `${lead}<p>${bits.join(' ')}</p>`;
+}
+
 function vicStateIntro(list, areas) {
   const links = areas.map(area => `<a href="${area.path}">${escapeHtml(area.nav)}</a>`).join(', ');
-  return `<p>This page lists ${list.length} Victorian services in the directory, grouped into ${areas.length} areas: ${links}.</p><p>Regional towns are included where a clinic website describes an after-hours, on-call or 24-hour service. Not every Victorian town is covered. Greater Sydney is on the <a href="/states/nsw">New South Wales</a> page. South East Queensland is on the <a href="/states/qld">Queensland</a> page.</p>`;
+  return `<p>This page lists ${list.length} Victorian services in the directory, grouped into ${areas.length} areas: ${links}.</p><p>Regional towns are included where a clinic website describes an after-hours, on-call or 24-hour service. Not every Victorian town is covered. Greater Sydney is on the <a href="/states/nsw">New South Wales</a> page. South East Queensland is on the <a href="/states/qld">Queensland</a> page. Greater Perth is on the <a href="/states/wa">Western Australia</a> page.</p>`;
 }
 
 function nswStateIntro(list, areas) {
   const links = areas.map(area => `<a href="${area.path}">${escapeHtml(area.nav)}</a>`).join(', ');
-  return `<p>This page lists ${list.length} Greater Sydney services in the directory, grouped into ${areas.length} areas: ${links}.</p><p>Coverage here is Greater Sydney, including the Central Coast and Blue Mountains clinics in this directory. It is not every New South Wales town, and it is not every Sydney suburb. Victoria is on the <a href="/states/vic">Victoria</a> page. South East Queensland is on the <a href="/states/qld">Queensland</a> page.</p>`;
+  return `<p>This page lists ${list.length} Greater Sydney services in the directory, grouped into ${areas.length} areas: ${links}.</p><p>Coverage here is Greater Sydney, including the Central Coast and Blue Mountains clinics in this directory. It is not every New South Wales town, and it is not every Sydney suburb. Victoria is on the <a href="/states/vic">Victoria</a> page. South East Queensland is on the <a href="/states/qld">Queensland</a> page. Greater Perth is on the <a href="/states/wa">Western Australia</a> page.</p>`;
 }
 
 function qldStateIntro(list, areas) {
   const links = areas.map(area => `<a href="${area.path}">${escapeHtml(area.nav)}</a>`).join(', ');
-  return `<p>This page lists ${list.length} South East Queensland services in the directory, grouped into ${areas.length} areas: ${links}.</p><p>Coverage here is Brisbane, the Gold Coast and the Sunshine Coast. It is not every Queensland town, and it is not every suburb in those areas. Victoria is on the <a href="/states/vic">Victoria</a> page. Greater Sydney is on the <a href="/states/nsw">New South Wales</a> page.</p>`;
+  return `<p>This page lists ${list.length} South East Queensland services in the directory, grouped into ${areas.length} areas: ${links}.</p><p>Coverage here is Brisbane, the Gold Coast and the Sunshine Coast. It is not every Queensland town, and it is not every suburb in those areas. Victoria is on the <a href="/states/vic">Victoria</a> page. Greater Sydney is on the <a href="/states/nsw">New South Wales</a> page. Greater Perth is on the <a href="/states/wa">Western Australia</a> page.</p>`;
+}
+
+function waStateIntro(list, areas) {
+  const links = areas.map(area => `<a href="${area.path}">${escapeHtml(area.nav)}</a>`).join(', ');
+  return `<p>This page lists ${list.length} Greater Perth services in the directory, grouped into ${areas.length} areas: ${links}.</p><p>Coverage here is Greater Perth, including Peel and Mandurah. It is not every Western Australian town, and it is not every Perth suburb. Victoria is on the <a href="/states/vic">Victoria</a> page. Greater Sydney is on the <a href="/states/nsw">New South Wales</a> page. South East Queensland is on the <a href="/states/qld">Queensland</a> page.</p>`;
 }
 
 function stateDescription(state, list) {
   if (state.code === 'NSW') return `${list.length} after-hours and 24-hour veterinary listings in Greater Sydney, New South Wales. Not every NSW town is covered. Call before travelling.`;
   if (state.code === 'QLD') return `${list.length} after-hours and 24-hour veterinary listings in South East Queensland (Brisbane, Gold Coast and Sunshine Coast). Not every Queensland town is covered. Call before travelling.`;
+  if (state.code === 'WA') return `${list.length} after-hours and 24-hour veterinary listings in Greater Perth, Western Australia. Not every WA town is covered. Call before travelling.`;
   return `${list.length} after-hours and 24-hour veterinary listings in Victoria. Not every Victorian town is covered. Call before travelling.`;
 }
 
@@ -328,7 +374,7 @@ function prerenderHomepage(indexHtml, clinics, areas) {
       {
         '@type': 'ItemList',
         '@id': `${SITE}/#directory`,
-        name: 'After-hours veterinary directory for Victoria, Greater Sydney and South East Queensland',
+        name: 'After-hours veterinary directory for Victoria, Greater Sydney, South East Queensland and Greater Perth',
         numberOfItems: ordered.length,
         itemListElement: ordered.map((clinic, index) => ({
           '@type': 'ListItem',
@@ -405,11 +451,11 @@ ${relatedNav(areas, area.path)}`;
 
 function twentyFourPage(clinics, areas) {
   const lastmod = maxDate(clinics.map(clinicLastmod));
-  const description = `${clinics.length} veterinary hospitals in this directory publish round-the-clock emergency care in Victoria, Greater Sydney or South East Queensland. Call before travelling. Published hours are not live availability, and this is not every hospital in Australia.`;
+  const description = `${clinics.length} veterinary hospitals in this directory publish round-the-clock emergency care in Victoria, Greater Sydney, South East Queensland or Greater Perth. Call before travelling. Published hours are not live availability, and this is not every hospital in Australia.`;
   const other = areas.filter(area => area.clinics.some(c => c.service_type !== 'hospital_24h'));
   const body = `${crumbs([{href: '/', label: 'Directory'}, {label: '24-hour emergency vets'}])}
 <h1>${escapeHtml(TWENTY_FOUR.h1)}</h1>
-<p>These ${clinics.length} records are the veterinary hospitals in the directory whose published service is round the clock, in Victoria, Greater Sydney and South East Queensland: ${escapeHtml(joinAnd(clinics.map(c => `${c.name} in ${c.suburb}`)))}. Each listing below uses the hours text stored for that clinic. Other states, and the rest of New South Wales and Queensland, are not listed yet.</p>
+<p>These ${clinics.length} records are the veterinary hospitals in the directory whose published service is round the clock, in Victoria, Greater Sydney, South East Queensland and Greater Perth: ${escapeHtml(joinAnd(clinics.map(c => `${c.name} in ${c.suburb}`)))}. Each listing below uses the hours text stored for that clinic. Other states, and the rest of New South Wales, Queensland and Western Australia, are not listed yet.</p>
 <p>Listings that are not published as 24-hour hospitals are on the ${joinAnd(other.map(area => `<a href="${area.path}">${escapeHtml(area.nav)}</a>`))} pages. A published 24-hour schedule is not confirmation the hospital can accept your pet.</p>
 ${CALLOUT}
 <h2>Published 24-hour hospitals</h2>
@@ -428,7 +474,7 @@ ${relatedNav(areas, TWENTY_FOUR.path)}`;
         inLanguage: 'en-AU',
         isPartOf: {'@id': `${SITE}/#website`},
         areaServed: coverageAreaServed(),
-        mainEntity: itemList(clinics, 'Published 24-hour veterinary hospitals in Victoria, Greater Sydney and South East Queensland'),
+        mainEntity: itemList(clinics, 'Published 24-hour veterinary hospitals in Victoria, Greater Sydney, South East Queensland and Greater Perth'),
       },
       breadcrumbNode(TWENTY_FOUR.path, [{href: '/', label: 'Directory'}, {label: '24-hour emergency vets'}]),
     ],
@@ -478,7 +524,7 @@ ${note ? `<p class="notice">${escapeHtml(note)}</p>` : ''}
 <h2>More in this directory</h2>
 <p><a href="${area.path}">${escapeHtml(area.nav)} listings</a> · <a href="${state.path}">${escapeHtml(state.nav)}</a></p>
 ${siblingBlock}
-<p>${roundTheClock ? 'This hospital is on the ' : 'This service is not published as a 24-hour hospital. See the '}<a href="${TWENTY_FOUR.path}">24-hour emergency vets</a> page, which lists published round-the-clock hospitals in Victoria, Greater Sydney and South East Queensland.</p>`;
+<p>${roundTheClock ? 'This hospital is on the ' : 'This service is not published as a 24-hour hospital. See the '}<a href="${TWENTY_FOUR.path}">24-hour emergency vets</a> page, which lists published round-the-clock hospitals in Victoria, Greater Sydney, South East Queensland and Greater Perth.</p>`;
   const entity = {
     '@type': 'VeterinaryCare',
     '@id': `${canonicalUrl(path)}#clinic`,
@@ -522,7 +568,7 @@ ${CALLOUT}
 <ul class="related"><li><a href="/">Veterinary directory</a></li>${STATES.map(state => `<li><a href="${state.path}">${escapeHtml(state.nav)}</a></li>`).join('')}${areas.map(area => `<li><a href="${area.path}">${escapeHtml(area.nav)}</a></li>`).join('')}<li><a href="${TWENTY_FOUR.path}">${escapeHtml(TWENTY_FOUR.nav)}</a></li><li><a href="/information">Privacy and data sources</a></li></ul>`;
   return pageShell({
     title: 'Page not found — Vet After Hours',
-    description: 'This address isn’t a Vet After Hours page. Search the directory or browse Victoria, Greater Sydney and South East Queensland.',
+    description: 'This address isn’t a Vet After Hours page. Search the directory or browse Victoria, Greater Sydney, South East Queensland and Greater Perth.',
     path: '',
     robots: 'noindex',
     body,
@@ -623,6 +669,7 @@ function browseNav(areas) {
     {title: 'Victoria', state: 'VIC', href: '/states/vic'},
     {title: 'Greater Sydney, NSW', state: 'NSW', href: '/states/nsw'},
     {title: 'South East Queensland', state: 'QLD', href: '/states/qld'},
+    {title: 'Greater Perth, WA', state: 'WA', href: '/states/wa'},
   ];
   const blocks = groups.map(group => {
     const links = areas.filter(area => area.state === group.state).map(area => `<li><a href="${area.path}">${escapeHtml(area.nav)}</a></li>`).join('');
@@ -675,7 +722,7 @@ ${jsonLd ? jsonLdScript(jsonLd) : ''}
 <main id="content" class="wrap info-page">
 ${body}
 </main>
-<footer class="footer wrap"><div><strong>vetafterhours.au</strong><p>Helping you find the next step.</p></div><div><a href="mailto:hello@vetafterhours.au">hello@vetafterhours.au</a><a href="/information">Privacy &amp; data sources</a></div><p class="pilot">Victoria, Greater Sydney and South East Queensland<br>Website-checked listings. Not every town is covered.</p></footer>
+<footer class="footer wrap"><div><strong>vetafterhours.au</strong><p>Helping you find the next step.</p></div><div><a href="mailto:hello@vetafterhours.au">hello@vetafterhours.au</a><a href="/information">Privacy &amp; data sources</a></div><p class="pilot">Victoria, Greater Sydney, South East Queensland and Greater Perth<br>Website-checked listings. Not every town is covered.</p></footer>
 </body>
 </html>
 `;
@@ -717,6 +764,15 @@ function coverageAreaServed() {
         {'@type': 'AdministrativeArea', name: 'Sunshine Coast'},
       ],
     },
+    {
+      '@type': 'AdministrativeArea',
+      name: 'Greater Perth',
+      containedInPlace: {'@type': 'State', name: 'Western Australia', containedInPlace: {'@type': 'Country', name: 'Australia'}},
+      containsPlace: [
+        {'@type': 'City', name: 'Perth'},
+        {'@type': 'City', name: 'Mandurah'},
+      ],
+    },
   ];
 }
 
@@ -734,12 +790,24 @@ function stateAreaServed(code) {
       ],
     };
   }
+  if (code === 'WA') {
+    return {
+      '@type': 'AdministrativeArea',
+      name: 'Greater Perth',
+      containedInPlace: {'@type': 'State', name: 'Western Australia'},
+      containsPlace: [
+        {'@type': 'City', name: 'Perth'},
+        {'@type': 'City', name: 'Mandurah'},
+      ],
+    };
+  }
   return {'@type': 'State', name: 'Victoria'};
 }
 
 function areaContained(area) {
   if (area.state === 'NSW') return {'@type': 'AdministrativeArea', name: area.region, containedInPlace: {'@type': 'AdministrativeArea', name: 'Greater Sydney', containedInPlace: {'@type': 'State', name: 'New South Wales'}}};
   if (area.state === 'QLD') return {'@type': 'AdministrativeArea', name: area.region, containedInPlace: {'@type': 'AdministrativeArea', name: 'South East Queensland', containedInPlace: {'@type': 'State', name: 'Queensland'}}};
+  if (area.state === 'WA') return {'@type': 'AdministrativeArea', name: area.region, containedInPlace: {'@type': 'AdministrativeArea', name: 'Greater Perth', containedInPlace: {'@type': 'State', name: 'Western Australia'}}};
   return {'@type': 'AdministrativeArea', name: area.region, containedInPlace: {'@type': 'State', name: 'Victoria'}};
 }
 

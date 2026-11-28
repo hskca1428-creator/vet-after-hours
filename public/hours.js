@@ -36,6 +36,8 @@ export function openingHoursFor(clinic) {
  * Wall-clock parts in an IANA timezone. Returns null if the timezone is missing or invalid.
  * Australia/Brisbane does not observe daylight saving, so it stays on AEST (UTC+10) while
  * Australia/Sydney and Australia/Melbourne are on AEDT (UTC+11).
+ * Australia/Perth does not observe daylight saving either, so it stays on AWST (UTC+8):
+ * three hours behind Melbourne during AEDT, and two hours behind Brisbane.
  */
 export function zonedDateTime(timeZone, date = new Date()) {
   if (!timeZone || typeof timeZone !== 'string') return null;
