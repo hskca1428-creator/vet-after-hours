@@ -76,6 +76,7 @@ test('homepage HTML lists every clinic without waiting for JavaScript', () => {
   assert.match(site.indexHtml, /href="\/areas\/melbourne"/);
   assert.match(site.indexHtml, /href="\/states\/qld"/);
   assert.match(site.indexHtml, /href="\/states\/wa"/);
+  assert.match(site.indexHtml, /href="\/states\/sa"/);
   assert.match(site.indexHtml, /href="\/areas\/gold-coast"/);
   assert.match(site.indexHtml, /href="\/areas\/sunshine-coast"/);
   assert.match(site.indexHtml, /href="\/areas\/peel-and-mandurah"/);
@@ -83,6 +84,9 @@ test('homepage HTML lists every clinic without waiting for JavaScript', () => {
   assert.match(site.indexHtml, /href="\/24-hour-emergency-vets"/);
   assert.match(site.indexHtml, /South East Queensland/);
   assert.match(site.indexHtml, /Greater Perth/);
+  assert.match(site.indexHtml, /Greater Adelaide/);
+  assert.match(site.indexHtml, /href="\/areas\/adelaide-hills"/);
+  assert.match(site.indexHtml, /href="\/areas\/adelaide-central-and-east"/);
   assert.match(site.indexHtml, /Not overnight cover/);
   assert.match(site.indexHtml, /Published hours conflict/);
   assert.match(site.indexHtml, /Overnight cover is not confirmed/);
@@ -193,6 +197,27 @@ test('clinic pages have unique copy, canonicals and VeterinaryCare JSON-LD', () 
   assert.match(page('/clinics/baldivis-emergency-vet').html, /After-hours service/);
   assert.match(page('/clinics/aec-midland').html, /Overnight cover is not confirmed/);
   assert.match(page('/clinics/mandurah-emergency-vets').html, /Mandurah WA 6210/);
+  const sashAdelaide = page('/clinics/sash-adelaide').html;
+  assert.match(sashAdelaide, /Kent Town SA 5067/);
+  assert.equal(veterinary(sashAdelaide).address.addressRegion, 'SA');
+  assert.equal(veterinary(sashAdelaide).areaServed.containedInPlace.name, 'South Australia');
+  assert.equal(openingHoursFor(clinics.find(c => c.id === 'sash-adelaide')).openingHours, 'Mo-Su 00:00-23:59');
+  assert.equal(openingHoursFor(clinics.find(c => c.id === 'pawprints-afterhours-blackwood')).openingHours, 'Mo-Su 00:00-23:59');
+  assert.equal(openingHoursFor(clinics.find(c => c.id === 'emergency-vet-adelaide-plympton')).openingHours, undefined);
+  assert.equal(openingHoursFor(clinics.find(c => c.id === 'adelaide-vet-walk-in-clinic-prospect')).openingHours, undefined);
+  assert.equal(openingHoursFor(clinics.find(c => c.id === 'meadows-veterinary-centre-emergency')).openingHours, undefined);
+  assert.equal(openingHoursFor(clinics.find(c => c.id === 'mount-barker-veterinary-clinic-emergency')).openingHours, undefined);
+  assert.match(page('/clinics/emergency-vet-adelaide-plympton').html, /Cannot treat rabbits/);
+  assert.match(page('/clinics/emergency-vet-adelaide-plympton').html, /not a 24-hour hospital/);
+  assert.match(page('/clinics/pawprints-afterhours-blackwood').html, /stale closure|2025|Christmas Parade/);
+  assert.match(page('/clinics/adelaide-vet-walk-in-clinic-prospect').html, /Not overnight cover/);
+  assert.match(page('/clinics/adelaide-vet-walk-in-clinic-prospect').html, /Public-holiday hours may vary/);
+  assert.match(page('/clinics/meadows-veterinary-centre-emergency').html, /Not overnight cover/);
+  const barker = page('/clinics/mount-barker-veterinary-clinic-emergency').html;
+  assert.match(barker, /Existing clients only/);
+  assert.match(barker, /Not overnight cover/);
+  assert.match(barker, /Mount Barker SA 5251/);
+  assert.match(barker, /class="badge clients-only"/);
 });
 
 test('opening hours are omitted when the stored text does not support them', () => {
@@ -266,6 +291,17 @@ test('area and 24-hour pages link the clinics they actually list', () => {
   assert.match(twentyFour, /Greater Sydney/);
   assert.match(twentyFour, /South East Queensland/);
   assert.match(twentyFour, /Greater Perth/);
+  assert.match(twentyFour, /Greater Adelaide/);
+  assert.match(twentyFour, /SASH Adelaide/);
+  assert.doesNotMatch(twentyFour, /Emergency Vet Adelaide/);
+  assert.doesNotMatch(twentyFour, /Adelaide Veterinary Walk In Clinic/);
+  assert.doesNotMatch(twentyFour, /Meadows Veterinary Centre/);
+  assert.doesNotMatch(twentyFour, /Mount Barker Veterinary Clinic/);
+  assert.doesNotMatch(twentyFour, /tel:0881213030/);
+  assert.doesNotMatch(twentyFour, /tel:0871232996/);
+  assert.doesNotMatch(twentyFour, /tel:0883883455/);
+  assert.doesNotMatch(twentyFour, /tel:0883911404/);
+  assert.match(twentyFour, /Northern Territory are not listed/);
   assert.doesNotMatch(twentyFour, /tel:0895241466/);
   assert.doesNotMatch(twentyFour, /tel:0865003010/);
   assert.doesNotMatch(twentyFour, /aec-noosa/);
@@ -275,6 +311,7 @@ test('area and 24-hour pages link the clinics they actually list', () => {
   assert.match(page('/states/vic').html, /href="\/areas\/melbourne"/);
   assert.match(page('/states/vic').html, /href="\/states\/qld"/);
   assert.match(page('/states/vic').html, /href="\/states\/wa"/);
+  assert.match(page('/states/vic').html, /href="\/states\/sa"/);
   assert.doesNotMatch(page('/states/vic').html, /SASH North Ryde/);
   assert.doesNotMatch(page('/states/vic').html, /Pet Emergency Stafford/);
   assert.doesNotMatch(page('/states/vic').html, /EVH Emergency Vet Hospital Wangara/);
@@ -283,7 +320,9 @@ test('area and 24-hour pages link the clinics they actually list', () => {
   assert.match(page('/states/nsw').html, /href="\/areas\/inner-west"/);
   assert.match(page('/states/nsw').html, /href="\/states\/qld"/);
   assert.match(page('/states/nsw').html, /href="\/states\/wa"/);
+  assert.match(page('/states/nsw').html, /href="\/states\/sa"/);
   assert.match(page('/states/qld').html, /href="\/states\/wa"/);
+  assert.match(page('/states/qld').html, /href="\/states\/sa"/);
   assert.match(page('/states/qld').html, /South East Queensland/);
   assert.match(page('/states/qld').html, /Pet Emergency Stafford/);
   assert.match(page('/states/qld').html, /href="\/states\/vic"/);
@@ -297,6 +336,7 @@ test('area and 24-hour pages link the clinics they actually list', () => {
   assert.match(page('/states/wa').html, /href="\/states\/vic"/);
   assert.match(page('/states/wa').html, /href="\/states\/nsw"/);
   assert.match(page('/states/wa').html, /href="\/states\/qld"/);
+  assert.match(page('/states/wa').html, /href="\/states\/sa"/);
   assert.match(page('/states/wa').html, /href="\/areas\/peel-and-mandurah"/);
   assert.doesNotMatch(page('/states/wa').html, /SASH North Ryde/);
   assert.doesNotMatch(page('/states/wa').html, /Pet Emergency Stafford/);
@@ -308,6 +348,27 @@ test('area and 24-hour pages link the clinics they actually list', () => {
   assert.match(page('/areas/perth-north-east-and-swan').html, /not confirmed overnight/);
   assert.match(page('/areas/rockingham-and-kwinana').html, /conflicting hours/);
   assert.match(page('/areas/peel-and-mandurah').html, /Mandurah Emergency Vets/);
+  assert.match(page('/states/sa').html, /Greater Adelaide/);
+  assert.match(page('/states/sa').html, /SASH Adelaide/);
+  assert.match(page('/states/sa').html, /href="\/states\/vic"/);
+  assert.match(page('/states/sa').html, /href="\/states\/nsw"/);
+  assert.match(page('/states/sa').html, /href="\/states\/qld"/);
+  assert.match(page('/states/sa').html, /href="\/states\/wa"/);
+  assert.match(page('/states/sa').html, /href="\/areas\/adelaide-hills"/);
+  assert.match(page('/states/sa').html, /not overnight cover/);
+  assert.doesNotMatch(page('/states/sa').html, /SASH North Ryde/);
+  assert.doesNotMatch(page('/states/sa').html, /Pet Emergency Stafford/);
+  assert.doesNotMatch(page('/states/sa').html, /EVH Emergency Vet Hospital Wangara/);
+  assert.doesNotMatch(page('/states/sa').html, /Advanced Vetcare Kensington/);
+  assert.doesNotMatch(page('/states/sa').html, /Roseworthy/);
+  assert.match(page('/areas/adelaide-central-and-east').html, /not overnight cover/);
+  assert.match(page('/areas/adelaide-central-and-east').html, /Public-holiday hours/);
+  assert.match(page('/areas/adelaide-west').html, /cannot treat rabbits/);
+  assert.doesNotMatch(page('/areas/adelaide-west').html, /not overnight/i);
+  assert.match(page('/areas/adelaide-south').html, /stale closure notice/);
+  assert.match(page('/areas/adelaide-hills').html, /not overnight cover/);
+  assert.match(page('/areas/adelaide-hills').html, /Existing clients only/);
+  assert.match(page('/areas/adelaide-hills').html, /regular clients only/);
   const sunshine = page('/areas/sunshine-coast').html;
   assert.match(sunshine, /not overnight cover/);
   assert.match(sunshine, /walk-in urgent care/);
@@ -320,7 +381,7 @@ test('area and 24-hour pages link the clinics they actually list', () => {
   assert.match(page('/areas/north-shore-and-northern-beaches').html, /Northside Emergency Veterinary Service/);
   assert.doesNotMatch(page('/states/nsw').html, /Baulkham Hills/);
   const areaServed = jsonLdBlocks(site.indexHtml)[0]['@graph'].find(node => node['@type'] === 'WebSite').areaServed;
-  assert.deepEqual(areaServed.map(area => area.name), ['Victoria', 'Greater Sydney', 'South East Queensland', 'Greater Perth']);
+  assert.deepEqual(areaServed.map(area => area.name), ['Victoria', 'Greater Sydney', 'South East Queensland', 'Greater Perth', 'Greater Adelaide']);
   const seq = areaServed.find(area => area.name === 'South East Queensland');
   assert.equal(seq.containedInPlace.name, 'Queensland');
   assert.deepEqual(seq.containsPlace.map(place => place.name), ['Brisbane', 'Gold Coast', 'Sunshine Coast']);
@@ -330,7 +391,12 @@ test('area and 24-hour pages link the clinics they actually list', () => {
   assert.equal(areaServed.some(area => area['@type'] === 'State' && area.name === 'Queensland'), false);
   assert.equal(areaServed.some(area => area['@type'] === 'State' && area.name === 'New South Wales'), false);
   assert.equal(areaServed.some(area => area['@type'] === 'State' && area.name === 'Western Australia'), false);
-  for (const name of ['South Australia', 'Tasmania', 'Australian Capital Territory', 'Northern Territory']) {
+  assert.equal(areaServed.some(area => area['@type'] === 'State' && area.name === 'South Australia'), false);
+  const greaterAdelaide = areaServed.find(area => area.name === 'Greater Adelaide');
+  assert.equal(greaterAdelaide['@type'], 'AdministrativeArea');
+  assert.equal(greaterAdelaide.containedInPlace.name, 'South Australia');
+  assert.deepEqual(greaterAdelaide.containsPlace.map(place => place.name), ['Adelaide', 'Mount Barker']);
+  for (const name of ['Tasmania', 'Australian Capital Territory', 'Northern Territory']) {
     assert.equal(JSON.stringify(areaServed).includes(name), false, name);
   }
   const qldArea = jsonLdBlocks(page('/areas/gold-coast').html)[0]['@graph'].find(node => node['@type'] === 'CollectionPage').areaServed;
@@ -341,6 +407,10 @@ test('area and 24-hour pages link the clinics they actually list', () => {
   assert.equal(waArea.name, 'Peel & Mandurah');
   assert.equal(waArea.containedInPlace.name, 'Greater Perth');
   assert.equal(waArea.containedInPlace.containedInPlace.name, 'Western Australia');
+  const saArea = jsonLdBlocks(page('/areas/adelaide-hills').html)[0]['@graph'].find(node => node['@type'] === 'CollectionPage').areaServed;
+  assert.equal(saArea.name, 'Adelaide Hills');
+  assert.equal(saArea.containedInPlace.name, 'Greater Adelaide');
+  assert.equal(saArea.containedInPlace.containedInPlace.name, 'South Australia');
   const descriptions = site.pages.map(item => meta(item.html, 'description'));
   assert.equal(new Set(descriptions).size, descriptions.length);
 });
@@ -355,17 +425,25 @@ test('sitemap lists every public URL with data-derived lastmod', () => {
   assert.equal(byLoc[`${SITE}/areas/sunshine-coast`], '2026-11-28');
   assert.equal(byLoc[`${SITE}/clinics/aec-noosa`], '2026-11-28');
   assert.equal(byLoc[`${SITE}/clinics/pet-emergency-stafford`], '2026-11-28');
-  assert.equal(entries.length, 126);
+  assert.equal(entries.length, 140);
   assert.equal(byLoc[`${SITE}/states/wa`], '2026-11-28');
   assert.equal(byLoc[`${SITE}/areas/peel-and-mandurah`], '2026-11-28');
   assert.equal(byLoc[`${SITE}/areas/perth-inner-and-north-central`], '2026-11-28');
   assert.equal(byLoc[`${SITE}/clinics/evh-wangara`], '2026-11-28');
   assert.equal(byLoc[`${SITE}/clinics/baldivis-emergency-vet`], '2026-11-28');
-  for (const path of ['/states/vic', '/states/nsw', '/states/qld', '/areas/melbourne', '/areas/inner-west', '/areas/blue-mountains', '/clinics/advanced-kensington', '/24-hour-emergency-vets', '/areas/brisbane-north-and-moreton-bay', '/areas/brisbane-south-logan-and-redlands', '/areas/brisbane-west-and-ipswich', '/areas/gold-coast', '/areas/perth-north-and-joondalup', '/areas/perth-south-and-fremantle', '/areas/perth-south-east-and-hills', '/areas/perth-north-east-and-swan', '/areas/rockingham-and-kwinana', '/clinics/sash-north-ryde', '/clinics/pet-emergency-stafford']) {
+  for (const path of ['/states/vic', '/states/nsw', '/states/qld', '/states/wa', '/areas/melbourne', '/areas/inner-west', '/areas/blue-mountains', '/clinics/advanced-kensington', '/24-hour-emergency-vets', '/areas/brisbane-north-and-moreton-bay', '/areas/brisbane-south-logan-and-redlands', '/areas/brisbane-west-and-ipswich', '/areas/gold-coast', '/areas/perth-north-and-joondalup', '/areas/perth-south-and-fremantle', '/areas/perth-south-east-and-hills', '/areas/perth-north-east-and-swan', '/areas/rockingham-and-kwinana', '/clinics/sash-north-ryde', '/clinics/pet-emergency-stafford', '/clinics/evh-wangara', '/areas/peel-and-mandurah']) {
     assert.equal(byLoc[`${SITE}${path}`] !== undefined, true, path);
   }
   assert.equal(byLoc[`${SITE}/qld`], undefined);
   assert.equal(byLoc[`${SITE}/wa`], undefined);
+  assert.equal(byLoc[`${SITE}/sa`], undefined);
+  assert.equal(byLoc[`${SITE}/states/sa`], '2026-11-28');
+  assert.equal(byLoc[`${SITE}/areas/adelaide-central-and-east`], '2026-11-28');
+  assert.equal(byLoc[`${SITE}/areas/adelaide-west`], '2026-11-28');
+  assert.equal(byLoc[`${SITE}/areas/adelaide-south`], '2026-11-28');
+  assert.equal(byLoc[`${SITE}/areas/adelaide-hills`], '2026-11-28');
+  assert.equal(byLoc[`${SITE}/clinics/sash-adelaide`], '2026-11-28');
+  assert.equal(byLoc[`${SITE}/clinics/mount-barker-veterinary-clinic-emergency`], '2026-11-28');
   assert.equal(byLoc[`${SITE}/information`], INFORMATION_LASTMOD);
   assert.equal(byLoc[`${SITE}/clinics/advanced-kensington`], '2026-09-19');
   assert.equal(byLoc[`${SITE}/clinics/arh-essendon`], '2026-09-05');
@@ -479,6 +557,18 @@ test('dev server serves crawlable HTML and a custom 404', async () => {
     const peel = await fetch('http://127.0.0.1:47823/areas/peel-and-mandurah');
     assert.equal(peel.status, 200);
     assert.match(await peel.text(), /Mandurah Emergency Vets/);
+    const saPage = await fetch('http://127.0.0.1:47823/states/sa');
+    assert.equal(saPage.status, 200);
+    assert.match(await saPage.text(), /Greater Adelaide/);
+    const saShortcut = await fetch('http://127.0.0.1:47823/sa', {redirect: 'manual'});
+    assert.equal(saShortcut.status, 301);
+    assert.equal(saShortcut.headers.get('location'), '/states/sa');
+    const hills = await fetch('http://127.0.0.1:47823/areas/adelaide-hills');
+    assert.equal(hills.status, 200);
+    assert.match(await hills.text(), /not overnight cover/);
+    const walkInPage = await fetch('http://127.0.0.1:47823/clinics/adelaide-vet-walk-in-clinic-prospect');
+    assert.equal(walkInPage.status, 200);
+    assert.match(await walkInPage.text(), /Not overnight cover/);
     const oldArea = await fetch('http://127.0.0.1:47823/areas/warragul', {redirect: 'manual'});
     assert.equal(oldArea.status, 301);
     assert.equal(oldArea.headers.get('location'), '/areas/gippsland');

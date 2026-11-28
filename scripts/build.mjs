@@ -23,4 +23,5 @@ const vicSuburbs = suburbs.filter(suburb => suburb.state === 'VIC').length;
 const nswSuburbs = suburbs.filter(suburb => suburb.state === 'NSW').length;
 const qldSuburbs = suburbs.filter(suburb => suburb.state === 'QLD').length;
 const waSuburbs = suburbs.filter(suburb => suburb.state === 'WA').length;
-console.log(`Built ${clinicsDoc.clinics.length} clinic records, ${site.pages.length} generated pages and ${suburbs.length} locality/postcode entries (${vicSuburbs} VIC, ${nswSuburbs} NSW, ${qldSuburbs} QLD, ${waSuburbs} WA).`);
+const saSuburbs = suburbs.filter(suburb => suburb.state === 'SA').length;
+console.log(`Built ${clinicsDoc.clinics.length} clinic records, ${site.pages.length} generated pages and ${suburbs.length} locality/postcode entries (${vicSuburbs} VIC, ${nswSuburbs} NSW, ${qldSuburbs} QLD, ${waSuburbs} WA, ${saSuburbs} SA).`);

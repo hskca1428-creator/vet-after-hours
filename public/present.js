@@ -25,6 +25,11 @@ const PUBLIC_NOTES = {
   'baldivis-emergency-vet': 'Published hours conflict: the emergency page lists 6pm–8am, and the site also calls itself a 24-hour hospital. Call to confirm daytime cover.',
   'aec-midland': 'Overnight cover is not confirmed. The hours widget ends at midnight. Call ahead before travelling.',
   'aes-osborne-park': 'Postcode 6017 is inferred from the Osborne Park locality. The clinic page does not print a postcode.',
+  'emergency-vet-adelaide-plympton': 'Cannot treat rabbits on site. Weekday hours are 5pm–8am, with 24-hour cover published for Saturday, Sunday and public holidays. It is not a 24-hour hospital on weekdays.',
+  'pawprints-afterhours-blackwood': 'The website still shows a closure notice for the Blackwood Christmas Parade on Friday 5 December, which was in 2025. Call to confirm there is no fixed closure.',
+  'adelaide-vet-walk-in-clinic-prospect': 'Walk-in urgent care with set evening and weekend hours. Not overnight cover and not a 24-hour hospital. Public-holiday hours may vary: the page lists 1pm–9pm and says to check the clinic profile.',
+  'meadows-veterinary-centre-emergency': 'Small-animal emergency cover from 6am to 10pm every day, including for people who are not existing clients. Not overnight cover and not a 24-hour hospital.',
+  'mount-barker-veterinary-clinic-emergency': 'On-site emergency care from 6:30am to 10:30pm for regular clients only. Not overnight cover. Outside those hours the clinic refers people to The Austin or SASH.',
 };
 
 export function escapeHtml(value) {

@@ -1,11 +1,23 @@
+/** Enough for a busy postcode (Greater Adelaide 5118 has 16 localities; Perth 6065 has 17) without an unbounded list. */
+const SUGGESTION_LIMIT = 20;
+
 export function normalize(value) { return value.toLowerCase().replace(/[^a-z0-9 ]/g, ' ').replace(/\s+/g, ' ').trim(); }
 export function matchSuburbs(suburbs, query) {
   const q = normalize(query);
   if (!q) return [];
+  const postcodeQuery = /^\d{4}$/.test(q);
   return suburbs.filter(s => {
     const state = s.state || '';
     return normalize(`${s.name} ${state} ${s.postcode}`).includes(q) || normalize(`${s.name} ${s.postcode}`).includes(q);
-  }).sort((a,b) => Number(normalize(b.name) === q) - Number(normalize(a.name) === q) || a.name.localeCompare(b.name) || String(a.state || '').localeCompare(String(b.state || '')) || String(a.postcode).localeCompare(String(b.postcode))).slice(0,10);
+  }).sort((a, b) => {
+    const nameRank = Number(normalize(b.name) === q) - Number(normalize(a.name) === q);
+    if (nameRank) return nameRank;
+    if (postcodeQuery) {
+      const postRank = Number(String(b.postcode) === q) - Number(String(a.postcode) === q);
+      if (postRank) return postRank;
+    }
+    return a.name.localeCompare(b.name) || String(a.state || '').localeCompare(String(b.state || '')) || String(a.postcode).localeCompare(String(b.postcode));
+  }).slice(0, SUGGESTION_LIMIT);
 }
 export function distanceKm(a,b) {
   const r = Math.PI / 180;

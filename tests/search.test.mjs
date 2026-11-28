@@ -42,22 +42,41 @@ test('finds suburb names, exact rendered selections and shared postcodes',()=>{
  assert.ok(perth.some(s => s.name==='Perth' && s.state==='WA' && s.postcode==='6000'));
  assert.ok(perth.every(s => s.state==='WA' && s.postcode==='6000'));
  const wangaraPostcode = matchSuburbs(suburbs,'6065');
- assert.equal(wangaraPostcode.length, 10);
+ assert.equal(wangaraPostcode.length, 17);
  assert.ok(wangaraPostcode.every(s => s.state==='WA' && s.postcode==='6065'));
- assert.ok(suburbs.some(s => s.name==='Wangara' && s.state==='WA' && s.postcode==='6065'));
+ assert.ok(wangaraPostcode.some(s => s.name==='Wangara'));
  const mandurahPostcode = matchSuburbs(suburbs,'6210');
- assert.equal(mandurahPostcode.length, 10);
+ assert.equal(mandurahPostcode.length, 20);
  assert.ok(mandurahPostcode.every(s => s.state==='WA' && s.postcode==='6210'));
- assert.ok(suburbs.some(s => s.name==='Mandurah' && s.state==='WA' && s.postcode==='6210'));
+ assert.ok(mandurahPostcode.some(s => s.name==='Mandurah'));
+ assert.equal(suburbs.filter(s => s.postcode==='6210').length, 23);
  const kensington = matchSuburbs(suburbs,'Kensington');
  assert.ok(kensington.some(s => s.state==='WA' && s.postcode==='6151'));
  assert.ok(kensington.some(s => s.state==='VIC' && s.postcode==='3031'));
  assert.ok(kensington.some(s => s.state==='NSW' && s.postcode==='2033'));
+ assert.ok(kensington.some(s => s.state==='SA' && s.postcode==='5068'));
  assert.equal(matchSuburbs(suburbs,'Kensington, WA 6151')[0].state,'WA');
  assert.equal(matchSuburbs(suburbs,'Kensington, WA 6151')[0].postcode,'6151');
  const osbornePark = matchSuburbs(suburbs,'Osborne Park');
  assert.ok(osbornePark.some(s => s.state==='WA' && s.postcode==='6017'));
  assert.ok(osbornePark.some(s => s.state==='NSW' && s.postcode==='2066'));
+ const prospect = matchSuburbs(suburbs,'Prospect');
+ assert.ok(prospect.some(s => s.state==='SA' && s.postcode==='5082'));
+ assert.ok(prospect.some(s => s.state==='NSW'));
+ const blackwood = matchSuburbs(suburbs,'Blackwood');
+ assert.ok(blackwood.some(s => s.state==='SA' && s.postcode==='5051'));
+ assert.ok(blackwood.some(s => s.state==='VIC'));
+ const adelaidePostcode = matchSuburbs(suburbs,'5000');
+ assert.equal(adelaidePostcode[0].name,'Adelaide');
+ assert.ok(adelaidePostcode.every(s => s.state==='SA' && s.postcode==='5000'));
+ assert.equal(matchSuburbs(suburbs,'5051').length, 4);
+ assert.ok(matchSuburbs(suburbs,'5051').every(s => s.state==='SA' && s.postcode==='5051'));
+ assert.equal(matchSuburbs(suburbs,'5251').length, 6);
+ assert.ok(matchSuburbs(suburbs,'5251').every(s => s.state==='SA' && s.postcode==='5251'));
+ const gawlerPostcode = matchSuburbs(suburbs,'5118');
+ assert.equal(gawlerPostcode.length, 16);
+ assert.ok(gawlerPostcode.every(s => s.state==='SA' && s.postcode==='5118'));
+ assert.ok(gawlerPostcode.some(s => s.name==='Gawler'));
  assert.equal(matchSuburbs(suburbs,'zzzxunknown').length,0);
  assert.equal(matchSuburbs(suburbs,'').length,0);
 });
@@ -109,10 +128,18 @@ test('distances are symmetrical, zero at origin, and Geelong results come first 
   if (id) assert.equal(ranked[0].id, id);
   assert.ok(ranked.slice(0,12).every(c => c.state==='WA'), postcode);
  }
- // Suggestion lists are capped at 10, and 6065/6210 share one centroid, so the first suggestion still sorts to the local WA clinic.
+ // Suggestion lists are capped at 20. 6065 fits; 6210 has 23 localities and still shares one centroid, so the first suggestion sorts to the local WA clinic.
  assert.equal(rankClinics(clinics, matchSuburbs(suburbs,'6000')[0])[0].state,'WA');
  assert.equal(rankClinics(clinics, matchSuburbs(suburbs,'6065')[0])[0].id,'evh-wangara');
  assert.equal(rankClinics(clinics, matchSuburbs(suburbs,'6210')[0])[0].id,'mandurah-emergency-vets');
+ for (const postcode of ['5000','5051','5251']) {
+  const ranked=rankClinics(clinics, matchSuburbs(suburbs, postcode)[0]);
+  assert.equal(ranked[0].state,'SA', postcode);
+  assert.ok(ranked.slice(0,9).every(c => c.state==='SA'), postcode);
+ }
+ assert.equal(rankClinics(clinics, matchSuburbs(suburbs,'5051')[0])[0].id,'pawprints-afterhours-blackwood');
+ assert.equal(rankClinics(clinics, suburbs.find(s => s.name==='Mount Barker' && s.state==='SA'))[0].id,'mount-barker-veterinary-clinic-emergency');
+ assert.equal(rankClinics(clinics, matchSuburbs(suburbs,'5251')[0])[0].id,'mount-barker-veterinary-clinic-emergency');
 });
 test('24-hour filter excludes unreviewed hours',()=>{
  const filtered=rankClinics(clinics,null,'24h');assert.ok(filtered.length);
@@ -124,7 +151,9 @@ test('24-hour filter excludes unreviewed hours',()=>{
  assert.ok(filtered.some(c=>c.id==='pet-emergency-stafford'));
  assert.ok(filtered.some(c=>c.id==='evh-wangara'));
  assert.ok(filtered.some(c=>c.id==='mandurah-emergency-vets'));
- assert.ok(!filtered.some(c=>c.id==='aec-noosa'||c.id==='aes-underwood'||c.id==='aec-kedron'||c.id==='baldivis-emergency-vet'||c.id==='aec-midland'));
+ assert.ok(filtered.some(c=>c.id==='sash-adelaide'));
+ assert.ok(filtered.some(c=>c.id==='pawprints-afterhours-blackwood'));
+ assert.ok(!filtered.some(c=>c.id==='aec-noosa'||c.id==='aes-underwood'||c.id==='aec-kedron'||c.id==='baldivis-emergency-vet'||c.id==='aec-midland'||c.id==='emergency-vet-adelaide-plympton'||c.id==='adelaide-vet-walk-in-clinic-prospect'||c.id==='meadows-veterinary-centre-emergency'||c.id==='mount-barker-veterinary-clinic-emergency'));
  const after=rankClinics(clinics,null,'after');
  assert.ok(after.some(c=>c.service_type==='after_hours_on_call'));
  assert.ok(after.some(c=>c.service_type==='after_hours_rotating'));
@@ -133,6 +162,10 @@ test('24-hour filter excludes unreviewed hours',()=>{
  assert.ok(after.some(c=>c.id==='bveccs-albany-creek'));
  assert.ok(after.some(c=>c.id==='baldivis-emergency-vet'&&c.service_type==='after_hours'));
  assert.ok(after.some(c=>c.id==='aec-midland'&&c.service_type==='after_hours'));
+ assert.ok(after.some(c=>c.id==='emergency-vet-adelaide-plympton'&&c.service_type==='after_hours'));
+ assert.ok(after.some(c=>c.id==='adelaide-vet-walk-in-clinic-prospect'&&c.service_type==='after_hours_limited'));
+ assert.ok(after.some(c=>c.id==='meadows-veterinary-centre-emergency'&&c.service_type==='after_hours_limited'));
+ assert.ok(after.some(c=>c.id==='mount-barker-veterinary-clinic-emergency'&&c.service_type==='after_hours_limited'));
  assert.ok(after.every(c=>c.service_type!=='hospital_24h'));
  assert.equal(rankClinics([{id:'x',name:'X',service_type:'on_call',verification_status:'website_checked'}],null,'after').length,1);
  assert.equal(rankClinics([{id:'x',name:'X',service_type:'after_hours_limited',verification_status:'website_checked'}],null,'24h').length,0);
@@ -162,23 +195,31 @@ test('unresolved and rotating destinations never produce directions',()=>{
  assert.equal(wangaraDirections.includes('VIC'), false);
  assert.match(formatAddress(clinics.find(c=>c.id==='mandurah-emergency-vets')), /Mandurah WA 6210/);
  assert.match(formatAddress(clinics.find(c=>c.id==='aes-osborne-park')), /Osborne Park WA 6017/);
+ const adelaideDirections=directionsUrl(clinics.find(c=>c.id==='sash-adelaide'));
+ assert.match(adelaideDirections, /SA/);
+ assert.match(adelaideDirections, /5067/);
+ assert.equal(adelaideDirections.includes('VIC'), false);
+ assert.match(formatAddress(clinics.find(c=>c.id==='mount-barker-veterinary-clinic-emergency')), /Mount Barker SA 5251/);
+ assert.match(formatAddress(clinics.find(c=>c.id==='pawprints-afterhours-blackwood')), /Blackwood SA 5051/);
 });
 test('data has unique IDs, valid phone links and no invented real-time status',()=>{
  assert.equal(new Set(clinics.map(c=>c.id)).size,clinics.length);
- const timezones={VIC:'Australia/Melbourne',NSW:'Australia/Sydney',QLD:'Australia/Brisbane',WA:'Australia/Perth'};
+ const timezones={VIC:'Australia/Melbourne',NSW:'Australia/Sydney',QLD:'Australia/Brisbane',WA:'Australia/Perth',SA:'Australia/Adelaide'};
  for(const c of clinics){assert.match(c.phone,/^(0\d{9}|1300\d{6}|1800\d{6})$/);assert.equal(c.accepting_patients_now,null);assert.equal(c.automated_open_now_enabled,false);assert.equal(typeof c.existing_clients_only,'boolean');assert.ok(c.region);assert.equal(c.coordinate_precision,'suburb_centroid');assert.equal(typeof c.locality_coordinates.lat,'number');assert.ok(timezones[c.state]);assert.equal(c.timezone,timezones[c.state]);}
  const clientsOnly=clinics.filter(c=>c.existing_clients_only).map(c=>c.id).sort();
- assert.deepEqual(clientsOnly,['family-vet-centre-wodonga','moe-veterinary-centre','traralgon-veterinary-centre']);
+ assert.deepEqual(clientsOnly,['family-vet-centre-wodonga','moe-veterinary-centre','mount-barker-veterinary-clinic-emergency','traralgon-veterinary-centre']);
  assert.equal(clinics.filter(c=>c.state==='NSW').length,17);
  assert.equal(clinics.filter(c=>c.state==='VIC').length,42);
  assert.equal(clinics.filter(c=>c.state==='QLD').length,16);
  assert.equal(clinics.filter(c=>c.state==='WA').length,12);
+ assert.equal(clinics.filter(c=>c.state==='SA').length,9);
  assert.equal(clinics.some(c=>c.id==='arh-baulkham-hills'),false);
  for(const id of ['veca-norwest','veca-campbelltown']) assert.match(clinics.find(c=>c.id===id).notes,/1 December 2026/);
  assert.equal(suburbs.filter(s=>s.state==='VIC').length,2933);
  assert.equal(suburbs.filter(s=>s.state==='NSW').length,1317);
  assert.equal(suburbs.filter(s=>s.state==='QLD').length,1006);
  assert.equal(suburbs.filter(s=>s.state==='WA').length,450);
+ assert.equal(suburbs.filter(s=>s.state==='SA').length,561);
  const milduraSuburb=suburbs.find(s=>s.name==='Mildura'&&s.postcode==='3500');
  assert.deepEqual(clinics.find(c=>c.id==='mildura-veterinary-hospital').locality_coordinates,{lat:milduraSuburb.lat,lon:milduraSuburb.lon});
  const maffra=clinics.find(c=>c.id==='gippsland-vet-hospital-maffra');
@@ -186,7 +227,9 @@ test('data has unique IDs, valid phone links and no invented real-time status',(
  assert.equal(maffra.locality_coordinates.lat,suburbs.find(s=>s.name==='Maffra').lat);
  for(const id of ['your-family-vet-horsham','shepparton-kialla-vets'])assert.equal(clinics.some(c=>c.id===id),false);
  assert.equal(JSON.stringify(clinics).includes('Eureka Veterinary'),false);
- assert.ok(suburbs.every(s=>s.lat<0&&s.lon>0&&/^\d{4}$/.test(s.postcode)&&(s.state==='VIC'||s.state==='NSW'||s.state==='QLD'||s.state==='WA')));
+ assert.ok(suburbs.every(s=>s.lat<0&&s.lon>0&&/^\d{4}$/.test(s.postcode)&&(s.state==='VIC'||s.state==='NSW'||s.state==='QLD'||s.state==='WA'||s.state==='SA')));
+ assert.equal(clinics.some(c=>c.id==='roseworthy-veterinary-hospital'||c.id==='vet-in-the-hills-woodside'||c.id==='aldgate-veterinary-clinic-phone-service'), false);
+ assert.equal(suburbs.some(s=>s.name==='Roseworthy'), false);
  const staffordSuburb=suburbs.find(s=>s.name==='Stafford Heights'&&s.postcode==='4053');
  assert.deepEqual(clinics.find(c=>c.id==='pet-emergency-stafford').locality_coordinates,{lat:staffordSuburb.lat,lon:staffordSuburb.lon});
  for (const id of ['evh-wangara','aes-osborne-park','sash-perth','mandurah-emergency-vets','baldivis-emergency-vet','aec-midland']) {
@@ -204,6 +247,31 @@ test('data has unique IDs, valid phone links and no invented real-time status',(
  const osborneRecord=clinics.find(c=>c.id==='aes-osborne-park');
  assert.match(osborneRecord.notes,/no postcode/);
  assert.match(osborneRecord.notes,/6017/);
+ const evaRecord=clinics.find(c=>c.id==='emergency-vet-adelaide-plympton');
+ assert.match(evaRecord.notes,/unable to treat any rabbits/);
+ assert.match(evaRecord.previous_review_notes,/Cannot treat rabbits/);
+ const pawprintsRecord=clinics.find(c=>c.id==='pawprints-afterhours-blackwood');
+ assert.match(pawprintsRecord.notes,/Blackwood Christmas Parade/);
+ assert.match(pawprintsRecord.previous_review_notes,/stale closure notice/);
+ const walkInRecord=clinics.find(c=>c.id==='adelaide-vet-walk-in-clinic-prospect');
+ assert.match(walkInRecord.notes,/public-holiday hours may vary/);
+ assert.match(walkInRecord.previous_review_notes,/Public-holiday hours vary/);
+ assert.match(walkInRecord.notes,/does not cover overnight/);
+ assert.equal(walkInRecord.service_type,'after_hours_limited');
+ const meadowsRecord=clinics.find(c=>c.id==='meadows-veterinary-centre-emergency');
+ assert.match(meadowsRecord.public_hours,/Not overnight/);
+ assert.equal(meadowsRecord.service_type,'after_hours_limited');
+ const barkerRecord=clinics.find(c=>c.id==='mount-barker-veterinary-clinic-emergency');
+ assert.equal(barkerRecord.existing_clients_only, true);
+ assert.match(barkerRecord.previous_review_notes,/Not overnight/);
+ assert.equal(barkerRecord.email, null);
+ assert.equal(meadowsRecord.email, null);
+ for (const id of ['sash-adelaide','greencross-vet-centre-norwood','nexus-emergency-vet-hospital-malvern','austin-urgent-care-mile-end-south','pawprints-afterhours-blackwood','emergency-vet-adelaide-plympton','adelaide-vet-walk-in-clinic-prospect','meadows-veterinary-centre-emergency','mount-barker-veterinary-clinic-emergency']) {
+  const clinic=clinics.find(c=>c.id===id);
+  const suburb=suburbs.find(s=>s.name===clinic.suburb&&s.postcode===clinic.postcode&&s.state==='SA');
+  assert.deepEqual(clinic.locality_coordinates,{lat:suburb.lat,lon:suburb.lon}, id);
+  assert.equal(clinic.timezone,'Australia/Adelaide');
+ }
  const fridayEvening=new Date('2026-11-27T07:30:00Z');
  const gippsland={...clinics.find(c=>c.id==='gippsland-warragul'),automated_open_now_enabled:true};
  assert.equal(scheduledOpenStatus(gippsland,fridayEvening),true);
@@ -229,6 +297,25 @@ test('data has unique IDs, valid phone links and no invented real-time status',(
  assert.equal(perthClock.minutes,15*60+30);
  assert.equal(melbourneClock.minutes-perthClock.minutes,3*60);
  assert.equal(brisbaneClock.minutes-perthClock.minutes,2*60);
+ // Adelaide daylight saving is ACDT (UTC+10:30): 18:00 at this instant, half an hour behind Melbourne and 2.5 hours ahead of Perth.
+ const adelaideClock=zonedDateTime('Australia/Adelaide',fridayEvening);
+ assert.equal(adelaideClock.weekday,'Fri');
+ assert.equal(adelaideClock.minutes,18*60);
+ assert.equal(melbourneClock.minutes-adelaideClock.minutes,30);
+ assert.equal(adelaideClock.minutes-perthClock.minutes,2*60+30);
+ // Standard time: Adelaide is ACST (UTC+9:30), still half an hour behind Melbourne (AEST, UTC+10) and 1.5 hours ahead of Perth.
+ const winterMorning=new Date('2026-07-15T02:00:00Z');
+ const melbourneWinter=zonedDateTime('Australia/Melbourne',winterMorning);
+ const adelaideWinter=zonedDateTime('Australia/Adelaide',winterMorning);
+ const perthWinter=zonedDateTime('Australia/Perth',winterMorning);
+ assert.equal(melbourneWinter.weekday,'Wed');
+ assert.equal(melbourneWinter.minutes,12*60);
+ assert.equal(adelaideWinter.weekday,'Wed');
+ assert.equal(adelaideWinter.minutes,11*60+30);
+ assert.equal(perthWinter.weekday,'Wed');
+ assert.equal(perthWinter.minutes,10*60);
+ assert.equal(melbourneWinter.minutes-adelaideWinter.minutes,30);
+ assert.equal(adelaideWinter.minutes-perthWinter.minutes,90);
  assert.equal(scheduledOpenStatus({...gippsland,timezone:'Australia/Melbourne'},fridayEvening),true);
  assert.equal(scheduledOpenStatus({...gippsland,timezone:'Australia/Brisbane'},fridayEvening),false);
  assert.equal(scheduledOpenStatus({...gippsland,timezone:'Australia/Perth'},fridayEvening),false);
@@ -241,5 +328,13 @@ test('data has unique IDs, valid phone links and no invented real-time status',(
  assert.equal(scheduledOpenStatus({...wangaraClinic,automated_open_now_enabled:true},fridayEvening),true);
  assert.equal(scheduledOpenStatus({...clinics.find(c=>c.id==='baldivis-emergency-vet'),automated_open_now_enabled:true},fridayEvening),null);
  assert.equal(scheduledOpenStatus({...clinics.find(c=>c.id==='aec-midland'),automated_open_now_enabled:true},fridayEvening),null);
+ assert.equal(scheduledOpenStatus({...gippsland,timezone:'Australia/Adelaide'},fridayEvening),true);
+ const sashAdelaide=clinics.find(c=>c.id==='sash-adelaide');
+ assert.equal(sashAdelaide.timezone,'Australia/Adelaide');
+ assert.equal(scheduledOpenStatus({...sashAdelaide,automated_open_now_enabled:true},fridayEvening),true);
+ assert.equal(scheduledOpenStatus({...clinics.find(c=>c.id==='emergency-vet-adelaide-plympton'),automated_open_now_enabled:true},fridayEvening),null);
+ assert.equal(scheduledOpenStatus({...clinics.find(c=>c.id==='adelaide-vet-walk-in-clinic-prospect'),automated_open_now_enabled:true},fridayEvening),null);
+ assert.equal(scheduledOpenStatus({...clinics.find(c=>c.id==='meadows-veterinary-centre-emergency'),automated_open_now_enabled:true},fridayEvening),null);
+ assert.equal(scheduledOpenStatus({...clinics.find(c=>c.id==='mount-barker-veterinary-clinic-emergency'),automated_open_now_enabled:true},fridayEvening),null);
 });
 

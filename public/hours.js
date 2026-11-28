@@ -38,6 +38,8 @@ export function openingHoursFor(clinic) {
  * Australia/Sydney and Australia/Melbourne are on AEDT (UTC+11).
  * Australia/Perth does not observe daylight saving either, so it stays on AWST (UTC+8):
  * three hours behind Melbourne during AEDT, and two hours behind Brisbane.
+ * Australia/Adelaide is UTC+9:30 in standard time (ACST) and UTC+10:30 during daylight
+ * saving (ACDT), a half-hour behind Melbourne in both seasons and ahead of Perth.
  */
 export function zonedDateTime(timeZone, date = new Date()) {
   if (!timeZone || typeof timeZone !== 'string') return null;

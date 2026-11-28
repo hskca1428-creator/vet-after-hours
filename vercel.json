@@ -29,6 +29,11 @@
       "source": "/wa",
       "destination": "/states/wa",
       "permanent": true
+    },
+    {
+      "source": "/sa",
+      "destination": "/states/sa",
+      "permanent": true
     }
   ],
   "headers": [
