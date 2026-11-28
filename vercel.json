@@ -24,6 +24,11 @@
       "source": "/qld",
       "destination": "/states/qld",
       "permanent": true
+    },
+    {
+      "source": "/wa",
+      "destination": "/states/wa",
+      "permanent": true
     }
   ],
   "headers": [
